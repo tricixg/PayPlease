@@ -19,10 +19,10 @@ import { forwardRef } from "react";
 import PropTypes from "prop-types";
 
 // Material Kit 2 React components
-import MKTypography from "components/MKTypography";
+import MKTypography from "../MKTypography";
 
 // Custom styles for MKProgress
-import MKProgressRoot from "components/MKProgress/MKProgressRoot";
+import MKProgressRoot from "./MKProgressRoot";
 
 const MKProgress = forwardRef(({ variant, color, value, label, ...rest }, ref) => (
   <>

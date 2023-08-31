@@ -19,7 +19,7 @@ import { forwardRef } from "react";
 import PropTypes from "prop-types";
 
 // Custom styles for the MKBadge
-import MKBadgeRoot from "components/MKBadge/MKBadgeRoot";
+import MKBadgeRoot from "./MKBadgeRoot";
 
 const MKBadge = forwardRef(
   ({ color, variant, size, circular, indicator, border, container, children, ...rest }, ref) => (

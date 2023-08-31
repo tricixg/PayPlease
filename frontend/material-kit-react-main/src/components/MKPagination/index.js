@@ -19,10 +19,10 @@ import { forwardRef, createContext, useContext, useMemo } from "react";
 import PropTypes from "prop-types";
 
 // Material Kit 2 React components
-import MKBox from "components/MKBox";
+import MKBox from "../MKBox";
 
 // Custom styles for MKPagination
-import MKPaginationItemRoot from "components/MKPagination/MKPaginationItemRoot";
+import MKPaginationItemRoot from "./MKPaginationItemRoot";
 
 // The Pagination main context
 const Context = createContext();

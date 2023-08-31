@@ -19,7 +19,7 @@ import { forwardRef } from "react";
 import PropTypes from "prop-types";
 
 // Custom styles for MKAvatar
-import MKAvatarRoot from "components/MKAvatar/MKAvatarRoot";
+import MKAvatarRoot from "./MKAvatarRoot";
 
 const MKAvatar = forwardRef(({ bgColor, size, shadow, ...rest }, ref) => (
   <MKAvatarRoot ref={ref} ownerState={{ shadow, bgColor, size }} {...rest} />
