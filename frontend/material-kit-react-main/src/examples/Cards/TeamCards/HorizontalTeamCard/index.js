@@ -21,8 +21,8 @@ import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 
 // Material Kit 2 React components
-import MKBox from "components/MKBox";
-import MKTypography from "components/MKTypography";
+import MKBox from "../../../../components/MKBox";
+import MKTypography from "../../../../components/MKTypography";
 
 function HorizontalTeamCard({ image, name, position, description }) {
   return (

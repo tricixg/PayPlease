@@ -20,8 +20,8 @@ import PropTypes from "prop-types";
 import Icon from "@mui/material/Icon";
 
 // Material Kit 2 React components
-import MKBox from "components/MKBox";
-import MKTypography from "components/MKTypography";
+import MKBox from "../../../components/MKBox";
+import MKTypography from "../../../components/MKTypography";
 
 function RotatingCardFront({ color, image, icon, title, description }) {
   return (

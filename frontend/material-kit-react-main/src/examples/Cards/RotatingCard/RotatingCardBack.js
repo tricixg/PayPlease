@@ -23,9 +23,9 @@ import { Link } from "react-router-dom";
 import MuiLink from "@mui/material/Link";
 
 // Material Kit 2 React components
-import MKBox from "components/MKBox";
-import MKTypography from "components/MKTypography";
-import MKButton from "components/MKButton";
+import MKBox from "../../../components/MKBox";
+import MKTypography from "../../../components/MKTypography";
+import MKButton from "../../../components/MKButton";
 
 function RotatingCard({ color, image, title, description, action }) {
   return (
