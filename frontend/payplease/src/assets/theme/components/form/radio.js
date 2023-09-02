@@ -14,12 +14,12 @@ Coded by www.creative-tim.com
 */
 
 // Material Kit 2 React base styles
-import borders from "assets/theme/base/borders";
-import colors from "assets/theme/base/colors";
+import borders from "../../base/borders";
+import colors from "../../base/colors";
 
 // Material Kit 2 React helper functions
-import pxToRem from "assets/theme/functions/pxToRem";
-import linearGradient from "assets/theme/functions/linearGradient";
+import pxToRem from "../../functions/pxToRem";
+import linearGradient from "../../functions/linearGradient";
 
 const { borderWidth, borderColor } = borders;
 const { transparent, info } = colors;

@@ -20,10 +20,10 @@ Coded by www.creative-tim.com
  */
 
 // Material Kit 2 React Base Styles
-import colors from "assets/theme/base/colors";
+import colors from "../../theme/base/colors";
 
 // Material Kit 2 React Helper Functions
-import boxShadow from "assets/theme/functions/boxShadow";
+import boxShadow from "../../theme/functions/boxShadow";
 
 const { black, white, tabs, coloredShadows } = colors;
 

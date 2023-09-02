@@ -14,10 +14,10 @@ Coded by www.creative-tim.com
 */
 
 // Material Kit 2 React Base Styles
-import borders from "assets/theme/base/borders";
+import borders from "../../base/borders";
 
 // Material Kit 2 React Helper Functions
-import pxToRem from "assets/theme/functions/pxToRem";
+import pxToRem from "../../functions/pxToRem";
 
 const { borderRadius } = borders;
 
