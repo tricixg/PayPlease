@@ -5,8 +5,6 @@ const router = express.Router();
 
 //router.get('/balance/:id', checkWalletBalance);
 
-router.get('/balance', (req, res) => {
-    res.render('balance');
-})
+router.get('/balance', checkWalletBalance)
 
 module.exports = router;

@@ -1,22 +1,6 @@
-const express = require('express');
-const { Pool, Client } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-
-const app = express();
-
-// Create a PostgreSQL connection pool
-const db = new Pool({
-    user: 'eightkeh',
-    host: 'dpg-cjnnfevjbvhs73fblg6g-a.singapore-postgres.render.com',
-    database: 'eightkeh',
-    password: 'jaiwAfX5DAbpzBz6FMuN0BsyS1RG62r2',
-    port: '5432',
-    ssl: {
-        rejectUnauthorized: false, 
-    },
-});
-
+const db = require('../db');
 
 const loginUser = (req, res) => {
     
@@ -40,18 +24,10 @@ const loginUser = (req, res) => {
         const passwordMatch = await bcrypt.compare(password, hashedPassword);
 
         if (passwordMatch) {
-            // Set session variables
-            req.session.user_id = user.user_id;
-            req.session.email = user.email;
-            req.session.username = user.username;
-            console.log(`Session email: ${req.session.user_id}`);
-            console.log(`Session email: ${req.session.email}`);
-            console.log(`Session username: ${req.session.username}`);
-            return res.redirect('/api/wallet/balance')
+            // add create session token and attach to response
+            res.status(200).json({ message: "Login successful"})
         } else {
-            return res.render('login', {
-                messageLogin: 'Incorrect Email or Password.'
-            });
+            res.status(400).json({ message: "Invalid Password" })
         }
     });
 };
