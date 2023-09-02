@@ -10,7 +10,7 @@ import MKButton from "../../assets/components/MKButton";
 
 // Material Kit 2 React examples
 import DefaultNavbar from "../../assets/examples/Navbars/DefaultNavbar";
-// import DefaultFooter from "../../assets/examples/Footers/DefaultFooter";
+import DefaultFooter from "../../assets/examples/Footers/DefaultFooter";
 
 // Page sections
 import Information from "./sections/Information";
@@ -20,7 +20,7 @@ import Information from "./sections/Information";
 
 // Routes
 import routes from "routes";
-// import footerRoutes from "footer.routes";
+import footerRoutes from "footer.routes";
 
 // Images
 import bgImage from "../../assets/images/bg-landing.jpg";
@@ -124,9 +124,9 @@ export default function Landing() {
         <Featuring />
         <Newsletter /> */}
       </Card>
-      {/* <MKBox pt={6} px={1} mt={6}>
+      <MKBox pt={6} px={1} mt={6}>
         <DefaultFooter content={footerRoutes} />
-      </MKBox> */}
+      </MKBox>
     </>
   );
 }
