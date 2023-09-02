@@ -1,38 +1,41 @@
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-const db = require('../db');
+const { getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
+const { createWallet } = require("../queries/walletQueries");
+const jwt = require('jsonwebtoken');
 
-const loginUser = (req, res) => {
+function createToken(user_id) {
+    return jwt.sign({user_id}, process.env.SECRET_KEY, {expiresIn: '2h'});
+}
+
+const loginUser = async(req, res) => {
     
     const email = req.body.email;
     const password = req.body.password;
 
-    db.query('SELECT * FROM wallet.users WHERE email = $1', [email], async (error, results) => {
-        if (error) {
-            console.error(error);
-            return res.status(500).json({ message: 'An error occurred while checking email' });
-        }
-
-        if (results.rows.length == 0) {
+    try {
+        const user = await getUserByEmail(email);
+        
+        if (!user) {
             return res.status(400).json({ message: 'Email or password is wrong.' });
         }
 
-        console.log(results.rows[0]);
-        const user = results.rows[0]; 
-
-        const hashedPassword = user.hashed_pw;
-        const passwordMatch = await bcrypt.compare(password, hashedPassword);
+        const passwordMatch = await bcrypt.compare(password, user.hashed_pw);
 
         if (passwordMatch) {
-            // add create session token and attach to response
-            res.status(200).json({ message: "Login successful"})
+            // Add code for session token creation here
+            const token = createToken(user.user_id)
+            res.status(200).json({user_id: user.user_id, token});
         } else {
-            res.status(400).json({ message: "Invalid Password" })
+            res.status(400).json({ message: 'Invalid Password' });
         }
-    });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'An error occurred while checking email' });
+    }
 };
 
-const signupUser = (req, res) => {
+const signupUser = async(req, res) => {
 
     // Parameters for users table
     const user_id = uuidv4();
@@ -40,45 +43,46 @@ const signupUser = (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     const phone = req.body.phone;
-    const accout_type = 'User';
+    const account_type = 'User';
 
     // Parameters for wallets table
     const wallet_id = uuidv4();
     const balance = 0;
 
-    // Check for errors in the user input
-    db.query('SELECT email FROM wallet.users WHERE email = $1', [email], async (error, results) => {
-        if (error) {
-            console.error(error);
-            return res.status(500).json({ message: 'An error occurred while checking email' });
-        }
+    try {
+        const emailTaken = await isEmailTaken(email);
 
-        if (results.rows.length > 0) {
+        if (emailTaken) {
             return res.status(400).json({ message: 'That email is already in use' });
         }
 
-        // Hashing password
-        let hashedPassword = await bcrypt.hash(password, 8);
+        const hashedPassword = await bcrypt.hash(password, 8);
+        
+        const user = {
+            user_id,
+            username,
+            email,
+            hashedPassword,
+            phone,
+            account_type: account_type,
+        };
 
-        // If correct user input, different email, password match etc, insert new user into database
-        db.query('INSERT INTO wallet.users (user_id, username, email, hashed_pw, phone_number, account_type) VALUES ($1, $2, $3, $4, $5, $6)', [user_id, username, email, hashedPassword, phone, accout_type], (error, results) => {
-            if (error) {
-                console.error(error);
-                return res.status(500).json({ message: 'An error occurred while inserting user' });
-            } else {
-                console.log(results);
-                // Create wallet for new user into database
-                db.query('INSERT INTO wallet.wallets (wallet_id, user_id, balance) VALUES ($1, $2, $3)', [wallet_id, user_id, balance], (error, results) => {
-                    if (error) {
-                        console.error(error);
-                        return res.status(500).json({ message: 'An error occurred while creating wallet' });
-                    }
-                })
-                return res.status(200).json({ message: 'User registered, wallet registered' });
-            }
-        });
-    });
-};
+        const userInsertResult = await insertUser(user);
 
+        const wallet = {
+            wallet_id,
+            user_id, 
+            balance,
+        }
+
+        await createWallet(wallet);
+
+        console.log(userInsertResult);
+        return res.status(200).json({ message: 'User registered, wallet registered' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'An error occurred while registering user' });
+    }
+}
 
 module.exports = { loginUser, signupUser };
