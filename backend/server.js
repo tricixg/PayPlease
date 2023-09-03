@@ -3,6 +3,7 @@ const userRouter = require('./routes/userRoutes');
 const walletRouter = require('./routes/walletRoutes');
 const transactionRouter = require('./routes/transactionRoutes');
 const authenticate = require('./middleware/authenticate');
+require('dotenv').config();
 
 const app = express();
 
