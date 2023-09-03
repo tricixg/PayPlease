@@ -19,7 +19,6 @@ import PropTypes from "prop-types";
 // @mui material components
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
-import Icon from "@mui/material/Icon";
 
 // Material Kit 2 React components
 import MKBox from "../../../components/MKBox";
@@ -66,19 +65,13 @@ function SimpleFooter({ company, links, light }) {
           color={light ? "white" : "text"}
           fontSize={size.sm}
         >
-          &copy; {new Date().getFullYear()}, made with
-          <MKBox fontSize={size.md} color={light ? "white" : "text"} mb={-0.5} mx={0.25}>
-            <Icon color="inherit" fontSize="inherit">
-              favorite
-            </Icon>
-          </MKBox>
-          by
+          &copy; PayPlease {new Date().getFullYear()}, by
           <Link href={href} target="_blank">
             <MKTypography variant="button" fontWeight="medium" color={light ? "white" : "dark"}>
               &nbsp;{name}&nbsp;
             </MKTypography>
           </Link>
-          for a better web.
+          for a TikTok Hackathon.
         </MKBox>
         <MKBox
           component="ul"
@@ -107,12 +100,7 @@ function SimpleFooter({ company, links, light }) {
 // Setting default values for the props of SimpleFooter
 SimpleFooter.defaultProps = {
   company: { href: "https://www.creative-tim.com/", name: "Creative Tim" },
-  links: [
-    { href: "https://www.creative-tim.com/", name: "Creative Tim" },
-    { href: "https://www.creative-tim.com/presentation", name: "About Us" },
-    { href: "https://www.creative-tim.com/blog", name: "Blog" },
-    { href: "https://www.creative-tim.com/license", name: "License" },
-  ],
+  links: [{ href: "https://github.com/eightkeh/PayPlease", name: "Project Repository" }],
   light: false,
 };
 

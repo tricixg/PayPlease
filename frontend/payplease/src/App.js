@@ -11,7 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./assets/theme";
 
 // Material Kit 2 React routes
-import routes from "routes";
+import { MainRoutes as routes } from "routes";
 
 // PayPlease pages
 import Landing from "pages/Landing";
@@ -32,7 +32,7 @@ export default function App() {
       }
 
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        return <Route exac key={route.key} path={route.route} element={route.component} />;
       }
 
       return null;
@@ -43,8 +43,8 @@ export default function App() {
       <CssBaseline />
       <Routes>
         {getRoutes(routes)}
-        <Route path="/" element={<Landing />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/landing" element={<Landing />} />
+        <Route path="*" element={<Navigate to="/landing" />} />
       </Routes>
     </ThemeProvider>
   );

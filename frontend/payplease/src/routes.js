@@ -23,32 +23,59 @@
 
 // @mui material components
 import Icon from "@mui/material/Icon";
-import WalletRoundedIcon from "@mui/icons-material/WalletRounded";
+import { WalletRounded, PagesRounded } from "@mui/icons-material";
 
 // @mui icons
-// import GitHubIcon from "@mui/icons-material/GitHub";
+import GitHubIcon from "@mui/icons-material/GitHub";
 
 // Pages
-import Landing from "./pages/temp";
-import { StarRounded } from "@mui/icons-material";
+import Landing from "./pages/Landing";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import Dashboard from "./pages/Dashboard";
 
-const routes = [
+export const MainRoutes = [
   {
-    name: "Name 1",
+    name: "Pages",
     icon: (
       <Icon>
-        <WalletRoundedIcon />
+        <PagesRounded />
       </Icon>
     ),
     columns: 1,
     rowsPerColumn: 2,
     collapse: [
       {
-        name: "landing pages",
+        name: "User Authentication",
         collapse: [
           {
-            name: "landing",
-            route: "/pages/landing",
+            name: "Sign In",
+            route: "/authentication/signin",
+            component: <SignIn />,
+          },
+          {
+            name: "Sign Up",
+            route: "/authentication/signup",
+            component: <SignUp />,
+          },
+        ],
+      },
+      {
+        name: "Wallet",
+        collapse: [
+          {
+            name: "Dashboard",
+            route: "/wallet/dashboard",
+            component: <Dashboard />,
+          },
+        ],
+      },
+      {
+        name: "Home",
+        collapse: [
+          {
+            name: "Landing",
+            route: "/landing",
             component: <Landing />,
           },
         ],
@@ -56,27 +83,33 @@ const routes = [
     ],
   },
   {
-    name: "Name 2",
+    name: "Repository",
+    icon: <GitHubIcon />,
+    route: "https://github.com/eightkeh/PayPlease",
+  },
+];
+
+export const WalletRoutes = [
+  {
+    name: "Pages",
     icon: (
       <Icon>
-        <StarRounded />
+        <WalletRounded />
       </Icon>
     ),
     columns: 1,
     rowsPerColumn: 2,
     collapse: [
       {
-        name: "landing pages",
+        name: "Wallet",
         collapse: [
           {
-            name: "landing",
-            route: "/pages/landing",
-            component: <Landing />,
+            name: "Dashboard",
+            route: "/wallet/dashboard",
+            component: <Dashboard />,
           },
         ],
       },
     ],
   },
 ];
-
-export default routes;

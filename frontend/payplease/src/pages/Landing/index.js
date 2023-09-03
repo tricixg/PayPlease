@@ -10,17 +10,16 @@ import MKButton from "../../assets/components/MKButton";
 
 // Material Kit 2 React examples
 import DefaultNavbar from "../../assets/examples/Navbars/DefaultNavbar";
-import DefaultFooter from "../../assets/examples/Footers/DefaultFooter";
+import SimpleFooter from "../../assets/examples/Footers/SimpleFooter";
 
 // Page sections
 import Information from "./sections/Information";
-// import Team from "./sections/Team";
+import Team from "./sections/Team";
 // import Featuring from "./sections/Featuring";
 // import Newsletter from "./sections/Newsletter";
 
 // Routes
-import routes from "routes";
-import footerRoutes from "footer.routes";
+import { MainRoutes as routes } from "routes";
 
 // Images
 import bgImage from "../../assets/images/bg-landing.jpg";
@@ -36,8 +35,8 @@ export default function Landing() {
         routes={routes}
         action={{
           type: "internal",
-          route: "/pages/landing",
-          label: "Sign Up",
+          route: "/authentication/signin",
+          label: "Sign In",
           color: "white",
         }}
         transparent
@@ -78,7 +77,7 @@ export default function Landing() {
                 },
               })}
             >
-              Cashless Convinience
+              Cashless Convenience
             </MKTypography>
             <MKTypography variant="body1" color="white" opacity={0.8} mt={1} mb={3}>
               Simplify your financial life with our secure and user-friendly e-wallet app. Unlock
@@ -120,12 +119,12 @@ export default function Landing() {
         }}
       >
         <Information />
-        {/* <Team />
-        <Featuring />
+        <Team />
+        {/* <Featuring />
         <Newsletter /> */}
       </Card>
-      <MKBox pt={6} px={1} mt={6}>
-        <DefaultFooter content={footerRoutes} />
+      <MKBox pt={6} px={1} mt={6} mb={4}>
+        <SimpleFooter company={{ href: "/", name: "eigthkeh" }} dark />
       </MKBox>
     </>
   );
