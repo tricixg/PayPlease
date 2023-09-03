@@ -31,7 +31,31 @@ export default function SignUp() {
 
   const handleSignUp = () => {
     // TODO: Handle Sign In
-    console.log("Clicked Sign Up!", usernameInput, phoneNumberInput, emailInput, passwordInput);
+    fetch("/api/user/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: usernameInput,
+        phone: phoneNumberInput,
+        email: emailInput,
+        password: passwordInput,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json(); // Parse the JSON response
+        } else {
+          throw new Error("Failed to sign up");
+        }
+      })
+      .then((data) => {
+        console.log("Success:", data);
+        // Redirect to home page
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        // Handle errors here, e.g., display an error message to the user
+      });
   };
 
   const handleUsernameInput = (event) => {

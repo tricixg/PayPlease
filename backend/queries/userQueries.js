@@ -40,7 +40,7 @@ async function isEmailTaken(email) {
 
 async function insertUser(user) {
     return new Promise((resolve, reject) => {
-        db.query('INSERT INTO wallet.users (user_id, username, email, hashed_pw, phone_number, account_type) VALUES ($1, $2, $3, $4, $5, $6)', [user_id, username, email, hashedPassword, phone, accout_type], (error, results) => {
+        db.query('INSERT INTO wallet.users (user_id, username, email, hashed_pw, phone_number, account_type) VALUES ($1, $2, $3, $4, $5, $6)', [user.user_id, user.username, user.email, user.hashedPassword, user.phone, user.account_type], (error, results) => {
             if (error) {
                 console.error(error);
                 reject(error);

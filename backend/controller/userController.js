@@ -44,7 +44,7 @@ const loginUser = async(req, res) => {
 
         if (passwordMatch) {
             // Add code for session token creation here
-            const token = createToken(user.user_id)
+            const token = createToken(user.user_id);
             res.status(200).json({user_id: user.user_id, token});
         } else {
             res.status(400).json({ message: 'Invalid Password' });
@@ -84,7 +84,7 @@ const signupUser = async(req, res) => {
             email,
             hashedPassword,
             phone,
-            account_type: account_type,
+            account_type
         };
 
         const userInsertResult = await insertUser(user);
@@ -97,7 +97,6 @@ const signupUser = async(req, res) => {
 
         await createWallet(wallet);
 
-        console.log(userInsertResult);
         return res.status(200).json({ message: 'User registered, wallet registered' });
     } catch (error) {
         console.error(error);
