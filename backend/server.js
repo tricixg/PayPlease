@@ -5,9 +5,10 @@ const transactionRouter = require('./routes/transactionRoutes');
 const authenticate = require('./middleware/authenticate');
 const cors = require("cors");
 const stripe = require("stripe")("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejoks9cs9bI7FWVjzqwyw9boj67ilx8FQfG9nzfWnuhPrZvmW8bJsD400a8z6IqeR");
-const uuid = require("uuid/v4");
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
+
 
 app.listen(2000, () => {
     console.log("listening to port 2000")
@@ -20,7 +21,7 @@ app.use((req, res, next) => {
 }); 
 
 app.use(express.json());
-//app.use(cors());
+app.use(cors());
 
 app.use("/api/user", userRouter);
 
@@ -35,9 +36,9 @@ app.post("/payment", (req, res) => {
     const {product, token} = req.body;
     console.log("PRODUCT", product)
     console.log("PRICE", product.price)
-    const idempontency_key = uuid()
+    const idempontency_key = uuidv4();
 
-    return stripe.customer.create({
+    return stripe.customers.create({
         email:token.email, 
         source: token.id
     }).then(customer => {
@@ -46,7 +47,7 @@ app.post("/payment", (req, res) => {
             currency: 'usd',
             customer: customer.id, 
             receipt_email: token.email,
-            description: `purchase of product.name`,
+            description: "top up to account",
             shipping: {
                 name: token.card.name,
                 address: {
@@ -54,11 +55,14 @@ app.post("/payment", (req, res) => {
                 }
             }
 
-        }, {idempontencykey})
+        }, {
+            idempotencyKey: idempontency_key
+        })
     })
     .then(result => res.status(200).json(result))
-    .catch(err => crossOriginIsolated.log(err))
+    .catch(err => console.log(err))
 });
+
 
 app.use("/api/transaction", transactionRouter);
 app.use("/api/wallet", walletRouter);

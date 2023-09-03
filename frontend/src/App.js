@@ -6,10 +6,12 @@ import StripeCheckout from 'react-stripe-checkout';
 function App() {
 
   const [product, setproduct] = useState({
-    name: "React from FB",
+    name: "Top up",
     price: 10,
-    productbY: "facebook"
+    productbY: "PayPlease"
   })
+  
+  //const [customAmount, setCustomAmount] = useState(product.price);
 
   const makePayment = token => {
     const body = {
@@ -19,6 +21,7 @@ function App() {
     const headers = {
       "Content-Type": "application/json"
     }
+
     return fetch(`http://localhost:2000/payment`, {
       method: "POST", 
       headers, 
@@ -34,22 +37,18 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        {/* <input
+          type="number"
+          placeholder="Enter custom amount"
+          value={customAmount}
+          onChange={(e) => setCustomAmount(e.target.value)}
+        /> */}
         <StripeCheckout
         stripeKey="pk_test_51NkrWXA2kau6fLsqzRhwcHc4TjtrI6fRUfWnJvOtV07BmB1eO95D2xvsyKOTysLMKFRTUxTy3qAJalaLUaj2sLu600tvv5LbWI"
         token={makePayment}
-        name="Buy React" 
+        name="Top up" 
         amount={product.price * 100}>
-        <button className="btn-large blue">Buy react is just ${product.price}</button>
+        <button className="btn-large blue">Top up ${product.price}</button>
         </StripeCheckout>
       </header>
     </div>
