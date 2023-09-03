@@ -1,5 +1,17 @@
 const db = require("../db");
 
+async function getUserByParam(param) {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM wallet.users WHERE email = $1 OR username = $1 OR phone_number = $1', [param], async (error, results) => {
+            if (error) {
+                console.error(error);
+                reject(error);
+            }
+            resolve(results.rows[0])
+        });
+    });
+}
+
 // Function to fetch user by email
 async function getUserByEmail(email) {
     return new Promise((resolve, reject) => {
@@ -7,7 +19,6 @@ async function getUserByEmail(email) {
             if (error) {
                 console.error(error);
                 reject(error);
-                return res.status(500).json({ message: 'An error occurred while checking email' });
             }
             resolve(results.rows[0])
         });
@@ -43,6 +54,7 @@ async function insertUser(user) {
 
 
 module.exports = {
+    getUserByParam,
     getUserByEmail,
     isEmailTaken,
     insertUser,

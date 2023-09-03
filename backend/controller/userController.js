@@ -1,12 +1,32 @@
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-const { getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
+const { getUserByParam, getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
 const { createWallet } = require("../queries/walletQueries");
 const jwt = require('jsonwebtoken');
 
 function createToken(user_id) {
     return jwt.sign({user_id}, process.env.SECRET_KEY, {expiresIn: '2h'});
 }
+
+const findUser = async (req, res) => {
+    const {username, email, phone, user_id} = req.query;
+
+    // use only 1 to search
+    const param = username || email || phone || user_id;
+
+    console.log("param", param)
+    try {
+        const user = await getUserByParam(param);
+        if (!user) {
+            return res.status(400).json({ message: "No such user exists"});
+        }
+
+        res.status(200).json({username: user.username, email: user.email, phone: user.phone_number, user_id: user.user_id})
+
+    } catch (err) {
+        res.status(500).json({message: "error finding user"});
+    }
+};
 
 const loginUser = async(req, res) => {
     
@@ -85,4 +105,4 @@ const signupUser = async(req, res) => {
     }
 }
 
-module.exports = { loginUser, signupUser };
+module.exports = { findUser, loginUser, signupUser };
