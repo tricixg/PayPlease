@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // react-router-dom components
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -28,12 +28,37 @@ export default function SignIn() {
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
+  const navigate = useNavigate();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
   const handleSignIn = () => {
     // TODO: Handle Sign In
-    console.log("Clicked Sign In!", emailInput, passwordInput);
+    fetch("/api/user/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: emailInput,
+        password: passwordInput,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Failed to sign in");
+        }
+      })
+      .then((data) => {
+        console.log("Success:", data);
+        const user_id = data.user_id;
+        //const token = data.token;
+        // Redirect to home page or perform other actions here
+        navigate(`/wallet/dashboard?user_id=${user_id}`);
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+        // Handle errors here, e.g., display an error message to the user
+      });
   };
 
   const handleEmailInput = (event) => {

@@ -6,6 +6,8 @@ import MKBox from "../../../assets/components/MKBox";
 import MKTypography from "../../../assets/components/MKTypography";
 import BalanceCounterCard from "../../../assets/examples/Cards/CounterCards/BalanceCounterCard";
 
+import { useLocation } from "react-router-dom";
+
 const SAMPLE_TRANSACTIONS = [
   {
     receiver: "Ang Yuze",
@@ -30,6 +32,30 @@ const SAMPLE_TRANSACTIONS = [
 ];
 
 export default function Overview() {
+  const location = useLocation();
+  const user_id = new URLSearchParams(location.search).get("user_id");
+  fetch(`/api/wallet/balance/${user_id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer ${token}",
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to fetch balance");
+      }
+    })
+    .then((data) => {
+      console.log("Balance:", data);
+      // Handle the fetched data
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      // Handle errors here
+    });
   return (
     <Grid container gap={8} alignItems={"center"} justifyContent={"center"}>
       {/* Right Card */}
