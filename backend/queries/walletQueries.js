@@ -61,7 +61,7 @@ async function createWallet(wallet) {
 }
 
 // TODO remove responses
-async function getWalletBalance(user) {
+async function getWalletBalance(user_id) {
     return new Promise((resolve, reject) => {
         db.query('SELECT * FROM wallet.wallets WHERE user_id = $1', [user_id], async (error, results) => {
             if (error) {
