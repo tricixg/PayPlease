@@ -27,8 +27,8 @@ export default function Landing() {
         action={{
           type: "internal",
           route: "/authentication/signin",
-          label: "Pay",
-          color: "info",
+          label: "Login / Logout",
+          color: "white",
         }}
         transparent
         light
