@@ -1,13 +1,17 @@
+// react-router components
+import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+
 // @mui material components
 import Grid from "@mui/material/Grid";
 
 // Material Kit 2 React components
 import MKBox from "../../../assets/components/MKBox";
 import MKTypography from "../../../assets/components/MKTypography";
-import BalanceCounterCard from "../../../assets/examples/Cards/CounterCards/BalanceCounterCard";
 
-import { useLocation } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+// Material Kit 2 React examples
+import BalanceCounterCard from "../../../assets/examples/Cards/CounterCards/BalanceCounterCard";
+import TransferModal from "./TransferModal";
 
 export default function Overview() {
   const [balance, setBalance] = useState(null);
@@ -65,16 +69,19 @@ export default function Overview() {
   }, [user_id, token]); // Add user_id and token as dependencies
 
   return (
-    <Grid container gap={8} alignItems={"center"} justifyContent={"center"}>
-      {/* Right Card */}
-      <Grid item xs={12} lg={5}>
+    <Grid container alignItems={"center"} justifyContent={"center"} rowGap={8} columnGap={4}>
+      <Grid item xs={12}>
+        <TransferModal />
+      </Grid>
+      {/* Left Card */}
+      <Grid item xs={10} lg={5}>
         <MKBox
           component="section"
           variant="gradient"
           bgColor="dark"
           position="relative"
-          py={6}
-          px={{ xs: 2, lg: 0 }}
+          py={5}
+          px={12}
           sx={{ borderRadius: 4 }}
         >
           {balance !== null && (
@@ -82,15 +89,15 @@ export default function Overview() {
           )}
         </MKBox>
       </Grid>
-      {/* Left Card */}
-      <Grid item xs={12} lg={5}>
+      {/* Right Card */}
+      <Grid item xs={10} lg={5}>
         <MKBox
           component="section"
           variant="gradient"
           bgColor="dark"
           position="relative"
           py={6}
-          px={{ xs: 12, lg: 8 }}
+          px={12}
           sx={{ borderRadius: 4 }}
         >
           <Grid container flexDirection="column">
