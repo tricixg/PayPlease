@@ -29,28 +29,39 @@ async function createWallet(wallet) {
     });
 }
 
-async function getWalletBalance(user_id) {
-    return new Promise((resolve, reject) => {
-        db.query('SELECT * FROM wallet.wallets WHERE user_id = $1', [user_id], async (error, results) => {
-            if (error) {
-                console.error(error);
-                reject(error);
-                return res.status(500).json({ message: 'An error occurred while checking balance' });
+function getWalletBalance(user_id, callback) {
+    db.query('SELECT * FROM wallet.wallets WHERE user_id = $1', [user_id], (error, results) => {
+        if (error) {
+            console.error(error);
+            callback(error, null);
+        } else {
+            if (results.rows.length === 0) {
+                callback(null, null); // User not found
             } else {
-                resolve(results.rows.length > 0 ? results.rows[0].balance : null);
+                const user = results.rows[0];
+                const balance = user.balance;
+                callback(null, balance);
             }
-            
-        
-            if (results.rows.length == 0) {
-                return res.status(400).json({ message: 'No such user exists.' });
+        }
+    });
+}
+
+// Get corresponding wallet_id
+function getWalletId(user_id, callback) {
+    db.query('SELECT * FROM wallet.wallets WHERE user_id = $1', [user_id], (error, results) => {
+        if (error) {
+            console.error(error);
+            callback(error, null);
+        } else {
+            if (results.rows.length === 0) {
+                callback(null, null);
             }
-        
             console.log(results.rows[0]);
             const user = results.rows[0];
-            const balance = user.balance;
-            res.status(200).json({balance});
-        });
-    })
+            const wid = user.wallet_id;
+            callback(null, wid);
+        }
+    });
 }
 
 
@@ -59,7 +70,8 @@ async function getWalletBalance(user_id) {
 module.exports = {
     updateWalletBalance,
     createWallet,
-    getWalletBalance
+    getWalletBalance,
+    getWalletId
 }
 
 

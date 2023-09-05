@@ -7,55 +7,63 @@ import MKTypography from "../../../assets/components/MKTypography";
 import BalanceCounterCard from "../../../assets/examples/Cards/CounterCards/BalanceCounterCard";
 
 import { useLocation } from "react-router-dom";
-
-const SAMPLE_TRANSACTIONS = [
-  {
-    receiver: "Ang Yuze",
-    amount: 1258.6,
-    date: new Date(Date.parse("03/20/2023")),
-  },
-  {
-    receiver: "Pang Rui Wei",
-    amount: 224558.1,
-    date: new Date(Date.parse("12/31/2023")),
-  },
-  {
-    receiver: "Branson Ng",
-    amount: 200.55,
-    date: new Date(Date.parse("01/08/2023")),
-  },
-  {
-    receiver: "Tricia Goh",
-    amount: 12.6,
-    date: new Date(Date.parse("03/01/2023")),
-  },
-];
+import React, { useState, useEffect } from "react";
 
 export default function Overview() {
+  const [balance, setBalance] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const location = useLocation();
   const user_id = new URLSearchParams(location.search).get("user_id");
-  fetch(`/api/wallet/balance/${user_id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer ${token}",
-    },
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Failed to fetch balance");
-      }
+  const token = new URLSearchParams(location.search).get("token");
+
+  useEffect(() => {
+    // Get wallet balance
+    fetch(`/api/wallet/balance/${user_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then((data) => {
-      console.log("Balance:", data);
-      // Handle the fetched data
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Failed to fetch balance");
+        }
+      })
+      .then((data) => {
+        console.log("Balance:", data.balance);
+        setBalance(data.balance);
+      })
+      .catch((error) => {
+        console.error("Error fetching balance:", error);
+      });
+
+    // Fetch transaction history
+    fetch(`/api/transaction/history/${user_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .catch((error) => {
-      console.error("Error:", error);
-      // Handle errors here
-    });
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Failed to fetch history");
+        }
+      })
+      .then((data) => {
+        console.log("History:", data);
+        setTransactions(data.transactions);
+      })
+      .catch((error) => {
+        console.error("Error fetching history:", error);
+      });
+  }, [user_id, token]); // Add user_id and token as dependencies
+
   return (
     <Grid container gap={8} alignItems={"center"} justifyContent={"center"}>
       {/* Right Card */}
@@ -69,7 +77,9 @@ export default function Overview() {
           px={{ xs: 2, lg: 0 }}
           sx={{ borderRadius: 4 }}
         >
-          <BalanceCounterCard color={"info"} count={100430} title={"Balance"} />
+          {balance !== null && (
+            <BalanceCounterCard color={"info"} count={balance} title={"Balance"} />
+          )}
         </MKBox>
       </Grid>
       {/* Left Card */}
@@ -87,7 +97,7 @@ export default function Overview() {
             <MKTypography variant="h5" color="light">
               Recent Transactions
             </MKTypography>
-            {SAMPLE_TRANSACTIONS.map((transaction, i) => {
+            {transactions.map((transaction, i) => {
               return (
                 <Grid
                   container
