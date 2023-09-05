@@ -28,13 +28,13 @@ export default function App() {
   }, [pathname]);
 
   const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
+    allRoutes.map((route, index) => {
       if (route.collapse) {
         return getRoutes(route.collapse);
       }
 
       if (route.route) {
-        return <Route exac key={route.key} path={route.route} element={route.component} />;
+        return <Route exact key={index} path={route.route} element={route.component} />;
       }
 
       return null;
