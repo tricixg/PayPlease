@@ -17,6 +17,7 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
+    "stripe": "^13.4.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
