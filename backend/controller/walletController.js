@@ -1,7 +1,7 @@
 const { getWalletBalance } = require("../queries/walletQueries");
 
 const checkWalletBalance = async (req, res) => {
-    const { id: user_id } = req.params;
+    const { id: user_id, token } = req.params;
 
     const { user_id: authenicated_user_id } = req.user;
 
@@ -11,16 +11,17 @@ const checkWalletBalance = async (req, res) => {
     }
 
     try {
-        const balance = await getWalletBalance(user_id);
-
-        if (balance === null) {
-            return res.status(400).json({ message: 'No such user exists.' });
-        }
-
-        res.status(200).json({balance});
+        getWalletBalance(user_id, (error, balance) => {
+            if (balance === null) {
+                // User not found
+                res.status(400).json({ message: 'No such user exists.' });
+            } else {
+                // Use the balance
+                res.status(200).json({balance});
+            }
+        });
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'An error occurred while checking balance' });
+        res.status(500).json({ message: 'An error occurred while checking balance' });
     }
 
 }

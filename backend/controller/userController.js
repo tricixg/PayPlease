@@ -45,7 +45,7 @@ const loginUser = async(req, res) => {
         if (passwordMatch) {
             // Add code for session token creation here
             const token = createToken(user.user_id);
-            res.status(200).json({user_id: user.user_id, token});
+            res.status(200).json({user_id: user.user_id, token: token});
         } else {
             res.status(400).json({ message: 'Invalid Password' });
         }

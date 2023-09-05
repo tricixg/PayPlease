@@ -16,6 +16,8 @@ import { MainRoutes as routes } from "routes";
 // PayPlease pages
 import Landing from "pages/Landing";
 
+// Session token
+
 export default function App() {
   const { pathname } = useLocation();
 
