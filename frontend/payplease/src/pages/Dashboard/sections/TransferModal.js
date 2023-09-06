@@ -1,4 +1,6 @@
+import React from "react";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 // @mui material components
 import Container from "@mui/material/Container";
@@ -24,10 +26,46 @@ export default function TransferModal() {
   const [amount, setAmount] = useState(0);
   const [factor, setFactor] = useState(1);
   const [recipient, setRecipient] = useState(null);
+  const location = useLocation();
+  const user_id = new URLSearchParams(location.search).get("user_id");
+  const token = new URLSearchParams(location.search).get("token");
 
-  const handleSendMoney = () => {
-    // TODO: Implement send money functionality
-    console.log(`Send ${amount} ti ${recipient}!`);
+  const handleSendMoney = async () => {
+    try {
+      // TODO: Implement send money functionality
+      console.log(`Send ${amount} to ${recipient}!`);
+      console.log(token);
+      const description = null;
+      fetch(`/api/transaction/transfer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          amountValue: amount,
+          debit_uid: user_id,
+          creditor: recipient,
+          description: description,
+        }),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to transfer");
+          }
+        })
+        .then((data) => {
+          console.log("Balance:", data);
+        })
+        .catch((error) => {
+          console.error("Error fetching balance:", error);
+        });
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle errors here, e.g., display an error message to the user
+    }
   };
 
   return (
@@ -67,7 +105,7 @@ export default function TransferModal() {
                 <MKButton variant="gradient" color="dark" onClick={toggleModal}>
                   close
                 </MKButton>
-                <MKButton variant="gradient" color="info" onClock={handleSendMoney}>
+                <MKButton variant="gradient" color="info" onClick={handleSendMoney}>
                   send
                 </MKButton>
               </MKBox>

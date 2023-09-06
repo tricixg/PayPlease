@@ -85,7 +85,15 @@ export default function Overview() {
           sx={{ borderRadius: 4 }}
         >
           {balance !== null && (
-            <BalanceCounterCard color={"info"} count={balance} title={"Balance"} />
+            <BalanceCounterCard
+              color={"info"}
+              count={Number(balance).toFixed(2)}
+              suffix={`${((Math.round(balance * 100) / 100) % 100)
+                .toFixed(2)
+                .toString()
+                .slice(1, 1)}`}
+              title={"Balance"}
+            />
           )}
         </MKBox>
       </Grid>

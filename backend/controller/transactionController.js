@@ -3,7 +3,8 @@ const { v4: uuidv4 } = require('uuid');
 
 const { queryTransactionHistory } = require('../queries/queryTransactionHistory');
 const {createNewTransaction} = require('../queries/transactionQueries');
-const {changeWalletBalance, updateWalletBalance, getWalletIdFromUserId} = require('../queries/walletQueries');
+const {changeWalletBalance, updateWalletBalance, getWalletIdFromUserId, getWalletId} = require('../queries/walletQueries');
+const { getUserByParam } = require("../queries/userQueries");
 // TODO secret key in .env
 const stripe = require('stripe')("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejoks9cs9bI7FWVjzqwyw9boj67ilx8FQfG9nzfWnuhPrZvmW8bJsD400a8z6IqeR");
 
@@ -103,7 +104,7 @@ const withdrawTransaction = (req, res) => {
 
 async function transferTransaction(req, res) {
     const debit_uid = req.body.debit_user_id;
-    const credit_uid = req.body.credit_user_id;
+    const credit_uid = await getUserByParam(req.body.creditor);
     const amountValue = req.body.amount;
     const transfer_description = req.body.description;
 
