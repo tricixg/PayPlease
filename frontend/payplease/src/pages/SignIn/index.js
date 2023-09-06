@@ -51,9 +51,10 @@ export default function SignIn() {
       .then((data) => {
         console.log("Success:", data);
         const user_id = data.user_id;
+        const token = data.token;
         //const token = data.token;
         // Redirect to home page or perform other actions here
-        navigate(`/wallet/dashboard?user_id=${user_id}`);
+        navigate(`/wallet/dashboard?user_id=${user_id}&token=${token}`);
       })
       .catch((error) => {
         console.log("Error:", error);

@@ -1,5 +1,7 @@
 const db = require("../db");
 const { v4: uuidv4 } = require('uuid');
+
+const { queryTransactionHistory } = require('../queries/queryTransactionHistory');
 const {createNewTransaction} = require('../queries/transactionQueries');
 const {changeWalletBalance, updateWalletBalance, getWalletIdFromUserId} = require('../queries/walletQueries');
 // TODO secret key in .env
@@ -7,9 +9,38 @@ const stripe = require('stripe')("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejok
 
 const emptyUUID = "00000000-0000-0000-0000-000000000000";
 
-const getTransactionHistory = (req, res) => {
-    console.log("transaction history");
-    res.status(200).json("transaction history");
+const getTransactionHistory = async (req, res) => {
+    const { id: user_id, token } = req.params;
+
+    const { user_id: authenicated_user_id } = req.user;
+
+    // verify if user to check is the same as user who made the request
+    if (authenicated_user_id !== user_id) {
+        return res.status(401).json({message: 'unauthorized'});
+    }
+    try {
+        
+        getWalletId(user_id, (error, wid) => {
+            if (error) {
+                console.error("An error occurred:", error);
+            } else if (wid === null) {
+                console.log("User not found");
+            } else {
+                console.log("Wallet ID:", wid);
+                queryTransactionHistory(wid, (error, transactions) => {
+                    if (error) {
+                        console.error("An error occurred:", error);
+                    } else {
+                        console.log("Transaction History:", transactions);
+                        res.status(200).json({ transactions });
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'An error occurred while checking history' });
+    }
 }
 
 const topUpTransaction = async (req, res) => {
