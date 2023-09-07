@@ -108,12 +108,6 @@ const withdrawTransaction = async (req, res) => {
 
         console.log(user_stripe_id)
 
-        try {
-            const account = await stripe.accounts.retrieve(user_stripe_id);
-            console.log(account);
-          } catch (error) {
-            console.error(error);
-          }
 
         const transfer = await stripe.transfers.create({
             amount: centAmount,
