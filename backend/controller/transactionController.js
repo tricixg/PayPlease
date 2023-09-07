@@ -1,10 +1,9 @@
 const db = require("../db");
 const { v4: uuidv4 } = require('uuid');
 
-const { queryTransactionHistory } = require('../queries/queryTransactionHistory');
-const {createNewTransaction} = require('../queries/transactionQueries');
-const {changeWalletBalance, updateWalletBalance, getWalletIdFromUserId, getWalletId} = require('../queries/walletQueries');
-const { getUserByParam } = require("../queries/userQueries");
+const { createNewTransaction, getTransactionHistoryByWallet } = require('../queries/transactionQueries');
+const { updateWalletBalance, getWalletFromUserId, getWalletIdFromUserId } = require('../queries/walletQueries');
+
 // TODO secret key in .env
 const stripe = require('stripe')("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejoks9cs9bI7FWVjzqwyw9boj67ilx8FQfG9nzfWnuhPrZvmW8bJsD400a8z6IqeR");
 
@@ -12,32 +11,23 @@ const emptyUUID = "00000000-0000-0000-0000-000000000000";
 
 const getTransactionHistory = async (req, res) => {
     const { id: user_id, token } = req.params;
-
     const { user_id: authenicated_user_id } = req.user;
 
     // verify if user to check is the same as user who made the request
     if (authenicated_user_id !== user_id) {
         return res.status(401).json({message: 'unauthorized'});
     }
+
     try {
-        
-        getWalletId(user_id, (error, wid) => {
-            if (error) {
-                console.error("An error occurred:", error);
-            } else if (wid === null) {
-                console.log("User not found");
-            } else {
-                console.log("Wallet ID:", wid);
-                queryTransactionHistory(wid, (error, transactions) => {
-                    if (error) {
-                        console.error("An error occurred:", error);
-                    } else {
-                        console.log("Transaction History:", transactions);
-                        res.status(200).json({ transactions });
-                    }
-                });
-            }
-        });
+        const wallet_id = await getWalletIdFromUserId(user_id);
+
+        if (!wallet_id) {
+            return res.status(400).json({message: "User does not exist"});
+        }
+
+        const transactions = await getTransactionHistoryByWallet(wallet_id);
+        res.status(200).json({ transactions });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'An error occurred while checking history' });
@@ -46,12 +36,12 @@ const getTransactionHistory = async (req, res) => {
 
 const topUpTransaction = async (req, res) => {
     
-    let {user_id, amount, token} = req.body;
+    let {user_id, amount, stripe_token} = req.body;
     const { user_id: authenicated_user_id } = req.user;
 
     // amount must be integer in cents.
-    amount = parseInt(amount);
-    dollarAmount = amount / 100;
+    dollarAmount = parseFloat(amount.toFixed(2));
+    centAmount = dollarAmount * 100;
 
     // verify if user to topUp is the same as user who made the request
     if (authenicated_user_id !== user_id) {
@@ -66,8 +56,8 @@ const topUpTransaction = async (req, res) => {
         }
 
         const customer = await stripe.customers.create({
-            email: token.email,
-            source: token.id,
+            email: stripe_token.email,
+            source: stripe_token.id,
         });
 
         const charge = await stripe.charges.create({
@@ -87,9 +77,9 @@ const topUpTransaction = async (req, res) => {
             "",
         );
         
-        changeWalletBalance(wallet_id, dollarAmount);
+        updateWalletBalance(wallet_id, dollarAmount);
 
-        res.status(200).json({amount: dollarAmount});
+        res.status(200).json({ message: "topup successful" });
     } catch (error) {
         console.log(error.message);
         res.status(400).json(error.message);
@@ -97,15 +87,67 @@ const topUpTransaction = async (req, res) => {
 
 }
 
-const withdrawTransaction = (req, res) => {
-    console.log("withdraw");
-    res.status(200).json("withdraw");
+const withdrawTransaction = async (req, res) => {
+    let {user_id, amount, user_stripe_id} = req.body;
+    const { user_id: authenicated_user_id } = req.user;
+
+    // amount must be integer in cents.
+    dollarAmount = parseFloat(amount.toFixed(2));
+    centAmount = dollarAmount * 100;
+
+    // verify if user to topUp is the same as user who made the request
+    if (authenicated_user_id !== user_id) {
+        return res.status(401).json({message: 'unauthorized'});
+    }
+
+    try {
+        const wallet_id = await getWalletIdFromUserId(user_id);
+        if (!wallet_id) {
+            throw Error("wallet does not exist")
+        }
+
+        console.log(user_stripe_id)
+
+        try {
+            const account = await stripe.accounts.retrieve(user_stripe_id);
+            console.log(account);
+          } catch (error) {
+            console.error(error);
+          }
+
+        const transfer = await stripe.transfers.create({
+            amount: centAmount,
+            currency: 'sgd',
+            destination: user_stripe_id,
+        });
+
+        await createNewTransaction(
+            uuidv4(),
+            "Withdraw",
+            dollarAmount,
+            wallet_id,
+            emptyUUID,
+            new Date(),
+            "",
+        );
+        
+        updateWalletBalance(wallet_id, dollarAmount * -1);
+
+        res.status(200).json({ message: "withdraw successful" });
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(400).json(error.message);
+    }
+
+
 }
+
 
 async function transferTransaction(req, res) {
     const debit_uid = req.body.debit_user_id;
-    const credit_uid = await getUserByParam(req.body.creditor);
-    const amountValue = req.body.amount;
+    const credit_uid = req.body.credit_user_id;
+    const amountValue = req.body.amount; // in dollars
     const transfer_description = req.body.description;
 
     const { user_id: authenicated_user_id } = req.user;
@@ -115,80 +157,39 @@ async function transferTransaction(req, res) {
         return res.status(401).json({message: 'unauthorized'});
     }
 
-    let credit_wallet_id = uuidv4();
-    let debit_wallet_id = uuidv4();
-    let creditor_balance = 0;
-    let debitor_balance = 0;
-
     try {
-        const results = await db.query('SELECT * FROM wallet.wallets WHERE user_id = $1', [debit_uid])
-        if (results.rows.length == 0) {
+        const debit_wallet = await getWalletFromUserId(debit_uid);
+        const credit_wallet = await getWalletFromUserId(credit_uid);
+        if (!debit_wallet || !credit_wallet) {
             return res.status(400).json({ message: 'No such user exists.' });
         }
-        const debitor = results.rows[0];
-        debit_wallet_id = debitor.wallet_id;
-        debitor_balance = parseFloat(debitor.balance);
 
-        // Check if debitor's account have enough balance to transfer out.
+        const debit_wallet_id = debit_wallet.wallet_id;
+        const debitor_balance = parseFloat(debit_wallet.balance);
+        const credit_wallet_id = credit_wallet.wallet_id;
+
+        // Check if debitor has sufficient balance
         if (debitor_balance < amountValue) {
             return res.status(400).json({message: "Insufficient balance in your account."})
-        } 
+        }
+
+        const trx_id = uuidv4();
+        const trx_type = 'Transfer';
+        const amount = parseFloat(amountValue.toFixed(2));
+        const currentDate = new Date();
+        
+        await createNewTransaction(trx_id, trx_type, amount, debit_wallet_id, credit_wallet_id, currentDate, transfer_description)
+
+        // Update debitor and creditor balance
+        updateWalletBalance(debit_wallet_id, amount * -1) // deduction
+        updateWalletBalance(credit_wallet_id, amount) 
+
+        res.status(200).json({ message: "Successfully transfered" })
+
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'An error occurred while checking balance' });
+        return res.status(500).json({ message: 'An error occurred while processing transaction' });
     }
-
-    try {
-        const results = await db.query('SELECT * FROM wallet.wallets WHERE user_id = $1', [credit_uid])
-        if (results.rows.length == 0) {
-            return res.status(400).json({ message: 'No such user exists.' });
-        }
-
-        const creditor = results.rows[0];
-        credit_wallet_id = creditor.wallet_id;
-        creditor_balance = parseFloat(creditor.balance);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'An error occurred while checking balance' });
-    }
-
-    // Create transaction entry
-    const trx_id = uuidv4();
-    const trx_type = 'Transfer';
-    const amount = parseFloat(amountValue);
-    const currentDate = new Date();
-
-    createNewTransaction(trx_id, trx_type, amount, debit_wallet_id, credit_wallet_id, currentDate, transfer_description, (error, results) => {
-        if (error) {
-            console.error('Failed to insert transaction:', error);
-            return res.status(500).json({ message: 'An error occurred while inserting transaction' });
-        } else {
-            console.log('Transaction inserted successfully.');
-            return res.status(200).json({ message: 'Transaction successful.' });
-        }
-    });
-
-    // Update debitor and creditor balance
-    const debitor_new_balance = debitor_balance - amount;
-    const creditor_new_balance = creditor_balance + amount;
-
-    console.log(credit_uid, credit_wallet_id, creditor_balance);
-    console.log("new balance debit/credit:", debitor_new_balance, creditor_new_balance);
-    updateWalletBalance(debitor_new_balance, debit_wallet_id, (error, results) => {
-        if (error) {
-            console.error('Failed to update wallet balance:', error);
-        } else {
-            console.log('Debit wallet balance updated successfully.');
-        }
-    });
-    updateWalletBalance(creditor_new_balance, credit_wallet_id, (error, results) => {
-        if (error) {
-            console.error('Failed to update wallet balance:', error);
-        } else {
-            console.log('Credit wallet balance updated successfully.');
-        }
-    });
-
 }
 
 module.exports = { getTransactionHistory, topUpTransaction, withdrawTransaction, transferTransaction };
