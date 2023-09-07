@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-const { getUserByParam, getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
+const { getUserById, getUserByUsername, getUserByPhone, getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
 const { createWallet } = require("../queries/walletQueries");
 const jwt = require('jsonwebtoken');
 
@@ -11,12 +11,16 @@ function createToken(user_id) {
 const findUser = async (req, res) => {
     const {username, email, phone, user_id} = req.query;
 
-    // use only 1 to search
-    const param = username || email || phone || user_id;
+    if (!username && !email && !phone && !user_id) {
+        return res.status(400).json({ message: "Search parameter cannot be empty" })
+    }
 
-    console.log("param", param)
     try {
-        const user = await getUserByParam(param);
+        const user = username ? await getUserByUsername(username)
+            : email ? await getUserByEmail(email)
+            : phone ? await getUserByPhone(phone)
+            : user_id ? await getUserById(user_id)
+            : "";
         if (!user) {
             return res.status(400).json({ message: "No such user exists"});
         }
