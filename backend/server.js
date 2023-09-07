@@ -7,8 +7,8 @@ require('dotenv').config();
 
 const app = express();
 
-app.listen(5000, () => {
-    console.log("listening to port 5000")
+app.listen(3000, () => {
+    console.log("listening to port 3000")
 });
 
 // middleware to log to console
