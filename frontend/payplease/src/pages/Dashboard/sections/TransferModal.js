@@ -26,6 +26,7 @@ export default function TransferModal() {
   const [amount, setAmount] = useState(0);
   const [factor, setFactor] = useState(1);
   const [recipient, setRecipient] = useState(null);
+  const [error, setError] = useState("");
   const location = useLocation();
   const user_id = new URLSearchParams(location.search).get("user_id");
   const token = new URLSearchParams(location.search).get("token");
@@ -63,10 +64,11 @@ export default function TransferModal() {
         })
         .catch((error) => {
           console.error("Error transferring:", error);
+          setError(error.message);
         });
     } catch (error) {
       console.error("Error:", error);
-      // Handle errors here, e.g., display an error message to the user
+      setError(error.message);
     }
   };
 
@@ -102,6 +104,11 @@ export default function TransferModal() {
                 recipient={recipient}
                 setRecipient={setRecipient}
               />
+              {error && (
+                <MKBox p={2} bgcolor="error.main" color="red" textAlign="center" fontSize="14px">
+                  {error}
+                </MKBox>
+              )}
               <Divider sx={{ my: 0 }} />
               <MKBox display="flex" justifyContent="space-between" p={1.5}>
                 <MKButton variant="gradient" color="dark" onClick={toggleModal}>

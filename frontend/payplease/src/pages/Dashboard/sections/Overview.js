@@ -16,7 +16,7 @@ import TransferModal from "./TransferModal";
 export default function Overview() {
   const [balance, setBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  //const [username, setUsername] = useState('');
+  // const [username, setUsername] = useState('');
   const location = useLocation();
   const user_id = new URLSearchParams(location.search).get("user_id");
   const token = new URLSearchParams(location.search).get("token");
@@ -76,10 +76,10 @@ export default function Overview() {
       .catch((error) => {
         console.error("Error fetching history:", error);
       });
-  }, [user_id, token]); // Add user_id and token as dependencies
+  }, [user_id, token]);
 
   return (
-    <Grid container alignItems={"center"} justifyContent={"center"} rowGap={8} columnGap={4}>
+    <Grid container alignItems="center" justifyContent="center" rowGap={8} columnGap={4}>
       <Grid item xs={12}>
         <TransferModal />
       </Grid>
@@ -96,13 +96,13 @@ export default function Overview() {
         >
           {balance !== null && (
             <BalanceCounterCard
-              color={"info"}
+              color="info"
               count={Number(balance).toFixed(2)}
               suffix={`${((Math.round(balance * 100) / 100) % 100)
                 .toFixed(2)
                 .toString()
                 .slice(1, 1)}`}
-              title={"Balance"}
+              title="Balance"
             />
           )}
         </MKBox>
@@ -122,69 +122,26 @@ export default function Overview() {
             <MKTypography variant="h5" color="light">
               Recent Transactions
             </MKTypography>
-            {/* Add titles */}
-            <Grid
-              container
-              flexDirection="row"
-              gap={10}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-            >
-              <Grid item>
-                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                  FROM
-                </MKTypography>
-              </Grid>
-              <Grid item>
-                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                  TO
-                </MKTypography>
-              </Grid>
-              <Grid item>
-                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                  DATE
-                </MKTypography>
-              </Grid>
-              <Grid item>
-                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                  AMOUNT
-                </MKTypography>
-              </Grid>
-            </Grid>
-            {/* Map over transactions */}
-            {transactions.map((transaction, i) => {
-              return (
-                <Grid
-                  container
-                  flexDirection="row"
-                  gap={10}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  key={i}
-                >
-                  <Grid item>
-                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                      {transaction.debitor_username}
-                    </MKTypography>
-                  </Grid>
-                  <Grid item>
-                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                      {transaction.creditor_username}
-                    </MKTypography>
-                  </Grid>
-                  <Grid item>
-                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                      {formatDateToDDMMYYYY(transaction.date)}
-                    </MKTypography>
-                  </Grid>
-                  <Grid item>
-                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
-                      ${transaction.amount}
-                    </MKTypography>
-                  </Grid>
-                </Grid>
-              );
-            })}
+            <table style={{ color: "white" }}>
+              <thead>
+                <tr>
+                  <th style={{ fontSize: "15px" }}>FROM</th>
+                  <th style={{ fontSize: "15px" }}>TO</th>
+                  <th style={{ fontSize: "15px" }}>DATE</th>
+                  <th style={{ fontSize: "15px" }}>AMOUNT</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((transaction, i) => (
+                  <tr key={i}>
+                    <td style={{ fontSize: "13px" }}>{transaction.debitor_username}</td>
+                    <td style={{ fontSize: "13px" }}>{transaction.creditor_username}</td>
+                    <td style={{ fontSize: "13px" }}>{formatDateToDDMMYYYY(transaction.date)}</td>
+                    <td style={{ fontSize: "13px" }}>${transaction.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </Grid>
         </MKBox>
       </Grid>
