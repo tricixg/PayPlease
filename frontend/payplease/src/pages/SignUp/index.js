@@ -8,17 +8,14 @@ import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 
 // Material Kit 2 React components
+import MKAlert from "../../assets/components/MKAlert";
 import MKBox from "../../assets/components/MKBox";
 import MKTypography from "../../assets/components/MKTypography";
 import MKInput from "../../assets/components/MKInput";
 import MKButton from "../../assets/components/MKButton";
 
 // Material Kit 2 React example components
-// import DefaultNavbar from "../../assets/examples/Navbars/DefaultNavbar";
 import SimpleFooter from "../../assets/examples/Footers/SimpleFooter";
-
-// Material Kit 2 React page layout routes
-// import routes from "routes";
 
 // Images
 import bgImage from "../../assets/images/bg-sign-in-basic.jpg";
@@ -28,6 +25,7 @@ export default function SignUp() {
   const [phoneNumberInput, setPhoneNumberInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
+  const [error, setError] = useState(null);
 
   const handleSignUp = () => {
     // TODO: Handle Sign In
@@ -55,6 +53,8 @@ export default function SignUp() {
       .catch((error) => {
         console.error("Error:", error);
         // Handle errors here, e.g., display an error message to the user
+        setError(error.message);
+        setTimeout(() => setError(null), 10000);
       });
   };
 
@@ -142,6 +142,11 @@ export default function SignUp() {
                       onChange={handlePasswordInput}
                     />
                   </MKBox>
+                  {error && (
+                    <MKBox mt={2}>
+                      <MKAlert color="error">{error}</MKAlert>
+                    </MKBox>
+                  )}
                   <MKBox mt={4} mb={1}>
                     <MKButton variant="gradient" color="primary" fullWidth onClick={handleSignUp}>
                       sign up

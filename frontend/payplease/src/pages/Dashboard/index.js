@@ -1,9 +1,13 @@
+import { useEffect } from "react";
+
+// react-router components
+import { useLocation, useNavigate } from "react-router-dom";
+
 // @mui material components
 import Grid from "@mui/material/Grid";
 
 // Material Kit 2 React components
 import MKBox from "../../assets/components/MKBox";
-// import MKTypography from "../../assets/components/MKTypography";
 
 // Material Kit 2 React examples
 import DefaultNavbar from "../../assets/examples/Navbars/DefaultNavbar";
@@ -19,6 +23,14 @@ import { WalletRoutes as routes } from "routes";
 import bgImage from "../../assets/images/bg-landing.jpg";
 
 export default function Landing() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isSignedIn = new URLSearchParams(location.search).get("token");
+
+  useEffect(() => {
+    if (!isSignedIn) navigate("/authentication/signin");
+  }, []);
+
   return (
     <>
       <DefaultNavbar

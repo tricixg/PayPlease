@@ -1,5 +1,9 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+
+// PropTypes
+import PropTypes from "prop-types";
+
+// react-router components
 import { useLocation } from "react-router-dom";
 
 // @mui material components
@@ -19,14 +23,18 @@ import MKTypography from "../../../assets/components/MKTypography";
 
 // sections
 import TransferForm from "./TransferForm";
+import MKAlert from "assets/components/MKAlert";
 
-export default function TransferModal() {
+export default function TransferModal({ setTransferSuccess }) {
+  TransferModal.propTypes = {
+    setTransferSuccess: PropTypes.func.isRequired,
+  };
   const [show, setShow] = useState(false);
   const toggleModal = () => setShow(!show);
   const [amount, setAmount] = useState(0);
   const [factor, setFactor] = useState(1);
   const [recipient, setRecipient] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const location = useLocation();
   const user_id = new URLSearchParams(location.search).get("user_id");
   const token = new URLSearchParams(location.search).get("token");
@@ -52,6 +60,9 @@ export default function TransferModal() {
       })
         .then((response) => {
           if (response.ok) {
+            setTransferSuccess(true);
+            setTimeout(() => setTransferSuccess(null), 10000);
+            toggleModal();
             return response.json();
           } else {
             return response.json().then((errorData) => {
@@ -68,7 +79,9 @@ export default function TransferModal() {
         });
     } catch (error) {
       console.error("Error:", error);
+      // Handle errors here, e.g., display an error message to the user
       setError(error.message);
+      setTimeout(() => setError(null), 15000);
     }
   };
 
@@ -114,6 +127,7 @@ export default function TransferModal() {
                 <MKButton variant="gradient" color="dark" onClick={toggleModal}>
                   close
                 </MKButton>
+                {error && <MKAlert color={"error"}>{error}</MKAlert>}
                 <MKButton variant="gradient" color="info" onClick={handleSendMoney}>
                   send
                 </MKButton>
