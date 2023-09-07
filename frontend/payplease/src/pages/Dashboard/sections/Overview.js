@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 
 // Material Kit 2 React components
+import MKAlert from "../../../assets/components/MKAlert";
 import MKBox from "../../../assets/components/MKBox";
 import MKTypography from "../../../assets/components/MKTypography";
 
@@ -16,7 +17,9 @@ import TransferModal from "./TransferModal";
 
 export default function Overview() {
   const [balance, setBalance] = useState(null);
+  const [balanceDecimals, setBalanceDecimals] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [transferSuccess, setTransferSuccess] = useState(null);
   const location = useLocation();
   const user_id = new URLSearchParams(location.search).get("user_id");
   const token = new URLSearchParams(location.search).get("token");
@@ -40,6 +43,13 @@ export default function Overview() {
       .then((data) => {
         console.log("Balance:", data.balance);
         setBalance(data.balance);
+        setBalanceDecimals(
+          Math.round(+parseFloat(`${data.balance}`))
+            .toFixed(2)
+            .toString()
+            .split(".")
+            .at(1)
+        );
       })
       .catch((error) => {
         console.error("Error fetching balance:", error);
@@ -72,7 +82,7 @@ export default function Overview() {
   return (
     <Grid container alignItems={"center"} justifyContent={"center"} rowGap={8} columnGap={4}>
       <Grid item xs={12}>
-        <TransferModal />
+        <TransferModal setTransferSuccess={setTransferSuccess} />
       </Grid>
       {/* Left Card */}
       <Grid item xs={10} lg={5}>
@@ -88,11 +98,8 @@ export default function Overview() {
           {balance !== null && (
             <BalanceCounterCard
               color={"info"}
-              count={Number(balance).toFixed(2)}
-              suffix={`${((Math.round(balance * 100) / 100) % 100)
-                .toFixed(2)
-                .toString()
-                .slice(1, 1)}`}
+              count={Number(balance)}
+              suffix={"." + balanceDecimals}
               title={"Balance"}
             />
           )}
@@ -130,7 +137,7 @@ export default function Overview() {
                   </Grid>
                   <Grid item>
                     <MKTypography variant="body2" color="light">
-                      {transaction.date.toLocaleDateString()}
+                      hello
                     </MKTypography>
                   </Grid>
                   <Grid item>
@@ -144,6 +151,8 @@ export default function Overview() {
           </Grid>
         </MKBox>
       </Grid>
+
+      {transferSuccess && <MKAlert color={"success"}>Transfer made successfully!</MKAlert>}
     </Grid>
   );
 }
