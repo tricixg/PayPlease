@@ -32,7 +32,7 @@ async function isEmailTaken(email) {
                 console.error(error);
                 reject(error);
             } else {
-                resolve(results.rows.lenth > 0);
+                resolve(results.rows.length > 0);
             }
         })
     });

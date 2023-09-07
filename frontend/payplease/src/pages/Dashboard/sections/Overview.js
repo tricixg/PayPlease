@@ -37,8 +37,9 @@ export default function Overview() {
         }
       })
       .then((data) => {
-        console.log("Balance:", data.balance);
-        setBalance(data.balance);
+        console.log("Balance:", parseFloat(data.balance));
+        const balanceDecimal = parseFloat(data.balance);
+        setBalance(balanceDecimal);
       })
       .catch((error) => {
         console.error("Error fetching balance:", error);
