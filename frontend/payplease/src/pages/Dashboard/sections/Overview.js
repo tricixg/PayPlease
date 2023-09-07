@@ -24,6 +24,14 @@ export default function Overview() {
   const user_id = new URLSearchParams(location.search).get("user_id");
   const token = new URLSearchParams(location.search).get("token");
 
+  function formatDateToDDMMYYYY(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based, so add 1
+    const year = String(date.getFullYear());
+    return `${day}/${month}/${year}`;
+  }
+
   useEffect(() => {
     // Get wallet balance
     fetch(`/api/wallet/balance/${user_id}`, {
@@ -120,6 +128,36 @@ export default function Overview() {
             <MKTypography variant="h5" color="light">
               Recent Transactions
             </MKTypography>
+            {/* Add titles */}
+            <Grid
+              container
+              flexDirection="row"
+              gap={10}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Grid item>
+                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                  FROM
+                </MKTypography>
+              </Grid>
+              <Grid item>
+                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                  TO
+                </MKTypography>
+              </Grid>
+              <Grid item>
+                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                  DATE
+                </MKTypography>
+              </Grid>
+              <Grid item>
+                <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                  AMOUNT
+                </MKTypography>
+              </Grid>
+            </Grid>
+            {/* Map over transactions */}
             {transactions.map((transaction, i) => {
               return (
                 <Grid
@@ -131,17 +169,22 @@ export default function Overview() {
                   key={i}
                 >
                   <Grid item>
-                    <MKTypography variant="body2" color="light">
-                      {transaction.receiver}
+                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                      {transaction.debitor_username}
                     </MKTypography>
                   </Grid>
                   <Grid item>
-                    <MKTypography variant="body2" color="light">
-                      hello
+                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                      {transaction.creditor_username}
                     </MKTypography>
                   </Grid>
                   <Grid item>
-                    <MKTypography variant="body2" color="light">
+                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
+                      {formatDateToDDMMYYYY(transaction.date)}
+                    </MKTypography>
+                  </Grid>
+                  <Grid item>
+                    <MKTypography variant="body2" color="light" style={{ fontSize: "14px" }}>
                       ${transaction.amount}
                     </MKTypography>
                   </Grid>
