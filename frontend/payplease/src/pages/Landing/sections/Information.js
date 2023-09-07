@@ -24,8 +24,8 @@ function Information() {
                 <MKBox mb={5}>
                   <DefaultInfoCard
                     icon={<PublicRounded color="info" />}
-                    title="Fully integrated"
-                    description="We get insulted by others, lose trust for those We get back freezes"
+                    title="Seamless Transactions"
+                    description="Effortlessly transfer funds between accounts with our intuitive e-wallet system, ensuring swift and secure transactions."
                   />
                 </MKBox>
               </Grid>
@@ -33,8 +33,8 @@ function Information() {
                 <MKBox mb={5}>
                   <DefaultInfoCard
                     icon={<PaymentsRounded color="info" />}
-                    title="Payments functionality"
-                    description="We get insulted by others, lose trust for those We get back freezes"
+                    title="Single-Channel integration"
+                    description="Streamline your financial payments through our direct link with Stripe, enabling fast pay-ins and payouts."
                   />
                 </MKBox>
               </Grid>
@@ -42,8 +42,8 @@ function Information() {
                 <MKBox mb={{ xs: 5, md: 0 }}>
                   <DefaultInfoCard
                     icon={<AppsRounded color="info" />}
-                    title="Prebuilt components"
-                    description="We get insulted by others, lose trust for those We get back freezes"
+                    title="Fortified Security Measures"
+                    description="With robust data consistency and advanced security protocols, your assets are shielded against common vulnerabilities, ensuring peace of mind."
                   />
                 </MKBox>
               </Grid>
@@ -51,8 +51,8 @@ function Information() {
                 <MKBox mb={{ xs: 5, md: 0 }}>
                   <DefaultInfoCard
                     icon={<ThreePRounded color="info" />}
-                    title="Improved platform"
-                    description="We get insulted by others, lose trust for those We get back freezes"
+                    title="Transparent Ledger System"
+                    description="Experience full visibility into your financial transactions with a PostgreSQL-powered ledger, providing a reliable record of every account movement."
                   />
                 </MKBox>
               </Grid>
@@ -61,13 +61,13 @@ function Information() {
           <Grid item xs={12} lg={4} sx={{ ml: "auto", mt: { xs: 3, lg: 0 } }}>
             <CenteredBlogCard
               image={digitalWallet}
-              title="Get insights on Search"
-              description="Website visitors today demand a frictionless user expericence — especially when using search. Because of the hight standards."
+              title="Get Started Now"
+              description="Embark on a seamless financial journey with our user-friendly e-wallet. Sign up today and revolutionize how you manage your money."
               action={{
                 type: "internal",
-                route: "pages/company/about-us",
+                route: "/authentication/signup",
                 color: "info",
-                label: "find out more",
+                label: "Sign Up",
               }}
             />
           </Grid>
