@@ -53,14 +53,16 @@ export default function TransferModal() {
           if (response.ok) {
             return response.json();
           } else {
-            throw new Error("Failed to transfer");
+            return response.json().then((errorData) => {
+              throw new Error(errorData.message);
+            });
           }
         })
         .then((data) => {
-          console.log("Balance:", data);
+          console.log("Data: ", data);
         })
         .catch((error) => {
-          console.error("Error fetching balance:", error);
+          console.error("Error transferring:", error);
         });
     } catch (error) {
       console.error("Error:", error);
