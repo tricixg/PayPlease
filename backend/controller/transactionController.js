@@ -10,7 +10,7 @@ const stripe = require('stripe')("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejok
 const emptyUUID = "00000000-0000-0000-0000-000000000000";
 
 const getTransactionHistory = async (req, res) => {
-    const { id: user_id, token } = req.params;
+    const { id: user_id } = req.params;
     const { user_id: authenicated_user_id } = req.user;
 
     // verify if user to check is the same as user who made the request
