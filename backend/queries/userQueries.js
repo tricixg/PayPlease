@@ -12,6 +12,36 @@ async function getUserById(user_id) {
     }
 }
 
+async function getUsernameFromWalletId(wallet_id) {
+    try {
+        // Query the wallet.wallets table to get the user_id
+        const userResult = await db.query(
+            'SELECT user_id FROM wallet.wallets WHERE wallet_id = $1',
+            [wallet_id]
+        );
+        if (userResult.rows.length === 0) {
+            // Handle the case where wallet_id is not found
+            return null;
+        }
+        const user_id = userResult.rows[0].user_id;
+        // Query the wallet.users table to get the username
+        const usernameResult = await db.query(
+            'SELECT username FROM wallet.users WHERE user_id = $1',
+            [user_id]
+        );
+        if (usernameResult.rows.length === 0) {
+            // Handle the case where user_id is not found (unlikely if your database is properly structured)
+            return null;
+        }
+        const username = usernameResult.rows[0].username;
+
+        return username;
+    } catch (error) {
+        console.error("Error getting username from wallet_id:", error);
+        throw Error(error.message);
+    }
+}
+
 async function getUserByUsername(username) {
     try {
         const user = await db.query(
@@ -47,6 +77,19 @@ async function getUserByPhone(phone_number) {
     }
 }
 
+async function getUserByParam(param) {
+    try {
+        const user = await db.query(
+            'SELECT * FROM wallet.users WHERE username = $1 OR email = $1 OR phone_number = $1', 
+            [param]
+        );
+        return user.rows[0];
+    } catch (error) {
+        console.log("Database Error: Error getting user by parameter");
+        throw Error(error.message);
+    }
+}
+
 async function isEmailTaken(email) {
     return new Promise((resolve, reject) => {
         db.query('SELECT email FROM wallet.users WHERE email = $1', [email], async (error, results) => {
@@ -77,6 +120,8 @@ module.exports = {
     getUserByUsername,
     getUserByEmail,
     getUserByPhone,
+    getUserByParam,
+    getUsernameFromWalletId,
     isEmailTaken,
     insertUser,
 }

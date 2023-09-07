@@ -43,7 +43,7 @@ export default function TransferModal() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          amountValue: amount,
+          amount: amount,
           debit_uid: user_id,
           creditor: recipient,
           description: description,

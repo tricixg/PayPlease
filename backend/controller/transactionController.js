@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const { createNewTransaction, getTransactionHistoryByWallet } = require('../queries/transactionQueries');
 const { updateWalletBalance, getWalletFromUserId, getWalletIdFromUserId } = require('../queries/walletQueries');
+const { getUserByParam, getUsernameFromWalletId } = require('../queries/userQueries');
 
 // TODO secret key in .env
 const stripe = require('stripe')("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejoks9cs9bI7FWVjzqwyw9boj67ilx8FQfG9nzfWnuhPrZvmW8bJsD400a8z6IqeR");
@@ -11,28 +12,48 @@ const emptyUUID = "00000000-0000-0000-0000-000000000000";
 
 const getTransactionHistory = async (req, res) => {
     const { id: user_id } = req.params;
-    const { user_id: authenicated_user_id } = req.user;
+    const { user_id: authenticated_user_id } = req.user;
 
-    // verify if user to check is the same as user who made the request
-    if (authenicated_user_id !== user_id) {
-        return res.status(401).json({message: 'unauthorized'});
+    // Verify if the user to check is the same as the user who made the request
+    if (authenticated_user_id !== user_id) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
     try {
         const wallet_id = await getWalletIdFromUserId(user_id);
 
         if (!wallet_id) {
-            return res.status(400).json({message: "User does not exist"});
+            return res.status(400).json({ message: "User does not exist" });
         }
 
         const transactions = await getTransactionHistoryByWallet(wallet_id);
-        res.status(200).json({ transactions });
 
+        // Create an array to store the modified transactions
+        const modifiedTransactions = [];
+
+        for (const transaction of transactions) {
+            const { credit_wallet_id, debit_wallet_id, ...restTransactionData } = transaction;
+            
+            const creditorUsername = await getUsernameFromWalletId(credit_wallet_id);
+            const debitorUsername = await getUsernameFromWalletId(debit_wallet_id);
+
+            // Create a modified transaction object with usernames
+            const modifiedTransaction = {
+                creditor_username: creditorUsername,
+                debitor_username: debitorUsername,
+                ...restTransactionData,
+            };
+
+            modifiedTransactions.push(modifiedTransaction);
+        }
+
+        res.status(200).json({ transactions: modifiedTransactions });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'An error occurred while checking history' });
     }
 }
+
 
 const topUpTransaction = async (req, res) => {
     
@@ -139,8 +160,9 @@ const withdrawTransaction = async (req, res) => {
 
 
 async function transferTransaction(req, res) {
-    const debit_uid = req.body.debit_user_id;
-    const credit_uid = req.body.credit_user_id;
+    const debit_uid = req.body.debit_uid;
+    const creditor = await getUserByParam(req.body.creditor);
+    const credit_uid = creditor.user_id;
     const amountValue = req.body.amount; // in dollars
     const transfer_description = req.body.description;
 
@@ -154,6 +176,8 @@ async function transferTransaction(req, res) {
     try {
         const debit_wallet = await getWalletFromUserId(debit_uid);
         const credit_wallet = await getWalletFromUserId(credit_uid);
+        console.log(debit_wallet);
+        console.log(credit_wallet);
         if (!debit_wallet || !credit_wallet) {
             return res.status(400).json({ message: 'No such user exists.' });
         }
