@@ -83,10 +83,13 @@ async function getUserByParam(param) {
             'SELECT * FROM wallet.users WHERE username = $1 OR email = $1 OR phone_number = $1', 
             [param]
         );
+        if (user.rows.length === 0) {
+            throw new Error("User does not exist.");
+        }
         return user.rows[0];
     } catch (error) {
-        console.log("Database Error: Error getting user by parameter");
-        throw Error(error.message);
+        console.error("Database Error:", error.message);
+        throw error;
     }
 }
 
