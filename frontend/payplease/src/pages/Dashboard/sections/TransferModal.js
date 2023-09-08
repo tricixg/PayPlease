@@ -65,19 +65,22 @@ export default function TransferModal({ setTransferSuccess }) {
             toggleModal();
             return response.json();
           } else {
-            throw new Error("Failed to transfer");
+            return response.json().then((errorData) => {
+              throw new Error(errorData.message);
+            });
           }
         })
         .then((data) => {
-          console.log("Balance:", data);
+          console.log("Data: ", data);
         })
         .catch((error) => {
-          console.error("Error fetching balance:", error);
+          console.error("Error transferring:", error);
+          setError(error.message);
         });
     } catch (error) {
       console.error("Error:", error);
       // Handle errors here, e.g., display an error message to the user
-      setError(error);
+      setError(error.message);
       setTimeout(() => setError(null), 15000);
     }
   };
@@ -114,6 +117,11 @@ export default function TransferModal({ setTransferSuccess }) {
                 recipient={recipient}
                 setRecipient={setRecipient}
               />
+              {error && (
+                <MKBox p={2} bgcolor="error.main" color="red" textAlign="center" fontSize="14px">
+                  {error}
+                </MKBox>
+              )}
               <Divider sx={{ my: 0 }} />
               <MKBox display="flex" justifyContent="space-between" p={1.5}>
                 <MKButton variant="gradient" color="dark" onClick={toggleModal}>

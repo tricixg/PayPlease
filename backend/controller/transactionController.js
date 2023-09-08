@@ -160,24 +160,28 @@ const withdrawTransaction = async (req, res) => {
 
 
 async function transferTransaction(req, res) {
-    const debit_uid = req.body.debit_uid;
-    const creditor = await getUserByParam(req.body.creditor);
-    const credit_uid = creditor.user_id;
-    const amountValue = req.body.amount; // in dollars
-    const transfer_description = req.body.description;
-
-    const { user_id: authenicated_user_id } = req.user;
-
-    // verify if debited user is the same as user who made the request
-    if (authenicated_user_id !== debit_uid) {
-        return res.status(401).json({message: 'unauthorized'});
-    }
 
     try {
+        const debit_uid = req.body.debit_uid;
+        let creditor;
+        try {
+            creditor = await getUserByParam(req.body.creditor);
+        } catch (creditorError) {
+            return res.status(400).json({ message: 'User does not exist' });
+        }
+        const credit_uid = creditor.user_id;
+        const amountValue = req.body.amount; // in dollars
+        const transfer_description = req.body.description;
+
+        const { user_id: authenicated_user_id } = req.user;
+
+        // verify if debited user is the same as user who made the request
+        if (authenicated_user_id !== debit_uid) {
+            return res.status(401).json({message: 'unauthorized'});
+        }
+
         const debit_wallet = await getWalletFromUserId(debit_uid);
         const credit_wallet = await getWalletFromUserId(credit_uid);
-        console.log(debit_wallet);
-        console.log(credit_wallet);
         if (!debit_wallet || !credit_wallet) {
             return res.status(400).json({ message: 'No such user exists.' });
         }
