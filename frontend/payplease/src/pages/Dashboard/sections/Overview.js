@@ -19,7 +19,6 @@ export default function Overview() {
   const [balance, setBalance] = useState(null);
   const [balanceDecimals, setBalanceDecimals] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  const [username, setUsername] = useState('');
   const [transferSuccess, setTransferSuccess] = useState(null);
   const location = useLocation();
   const user_id = new URLSearchParams(location.search).get("user_id");
