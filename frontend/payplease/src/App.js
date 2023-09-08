@@ -17,6 +17,7 @@ import { MainRoutes as routes } from "routes";
 import Landing from "pages/Landing";
 
 // Session token
+import { AuthContextProvider } from "context/AuthContext";
 
 export default function App() {
   const { pathname } = useLocation();
@@ -43,11 +44,13 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="/landing" element={<Landing />} />
-        <Route path="*" element={<Navigate to="/landing" />} />
-      </Routes>
+      <AuthContextProvider>
+        <Routes>
+          {getRoutes(routes)}
+          <Route path="/landing" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/landing" />} />
+        </Routes>
+      </AuthContextProvider>
     </ThemeProvider>
   );
 }
