@@ -7,6 +7,8 @@ const cors = require("cors");
 const stripe = require("stripe")("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejoks9cs9bI7FWVjzqwyw9boj67ilx8FQfG9nzfWnuhPrZvmW8bJsD400a8z6IqeR");
 const { v4: uuidv4 } = require('uuid');
 
+require('dotenv').config();
+
 const app = express();
 
 
@@ -20,6 +22,9 @@ app.use((req, res, next) => {
     next();
 }); 
 
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded({ extended: false }));
+// Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 app.use(cors());
 
@@ -27,7 +32,7 @@ app.use("/api/user", userRouter);
 
 // ----- Protected Routes -----
 app.use(authenticate)
-
+//here
 app.get("/", (req, res) => {
     res.setEncoding("IT WORKS");
 });
@@ -63,7 +68,7 @@ app.post("/payment", (req, res) => {
     .catch(err => console.log(err))
 });
 
-
+//here
 app.use("/api/transaction", transactionRouter);
 app.use("/api/wallet", walletRouter);
 
