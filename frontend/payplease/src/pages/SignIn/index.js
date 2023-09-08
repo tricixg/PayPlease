@@ -21,6 +21,9 @@ import SimpleFooter from "../../assets/examples/Footers/SimpleFooter";
 // Images
 import bgImage from "../../assets/images/bg-sign-in-basic.jpg";
 
+// Session Authentication
+import { useAuth } from "context/AuthContext";
+
 export default function SignIn() {
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -28,6 +31,7 @@ export default function SignIn() {
   const navigate = useNavigate();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
   const [error, setError] = useState(null);
+  const { login: loginAuth } = useAuth();
 
   const handleSignIn = () => {
     // TODO: Handle Sign In
@@ -47,12 +51,13 @@ export default function SignIn() {
         }
       })
       .then((data) => {
+        // response should be {user_id, token}
+        localStorage.setItem("user", JSON.stringify(data));
+        loginAuth(data);
         console.log("Success:", data);
-        const user_id = data.user_id;
-        const token = data.token;
         //const token = data.token;
         // Redirect to home page or perform other actions here
-        navigate(`/wallet/dashboard?user_id=${user_id}&token=${token}`);
+        navigate("/wallet/dashboard");
       })
       .catch((error) => {
         console.log("Error:", error);

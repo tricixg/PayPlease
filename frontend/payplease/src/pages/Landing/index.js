@@ -15,8 +15,6 @@ import SimpleFooter from "../../assets/examples/Footers/SimpleFooter";
 // Page sections
 import Information from "./sections/Information";
 import Team from "./sections/Team";
-// import Featuring from "./sections/Featuring";
-// import Newsletter from "./sections/Newsletter";
 
 // Routes
 import { MainRoutes as routes } from "routes";
@@ -26,6 +24,8 @@ import bgImage from "../../assets/images/bg-landing.jpg";
 import logoStripe from "../../assets/images/logos/logo-stripe.svg";
 import logoReact from "../../assets/images/logos/logo-react.svg";
 import logoPostgres from "../../assets/images/logos/logo-postgres.svg";
+import logoExpressJS from "../../assets/images/logos/logo-express-js.svg";
+import logoNodeJS from "../../assets/images/logos/logo-nodejs.svg";
 
 export default function Landing() {
   return (
@@ -100,6 +100,12 @@ export default function Landing() {
                 <img src={logoReact} />
               </MKTypography>
               <MKTypography component="a" href="#" mr={3}>
+                <img src={logoExpressJS} />
+              </MKTypography>
+              <MKTypography component="a" href="#" mr={3}>
+                <img src={logoNodeJS} />
+              </MKTypography>
+              <MKTypography component="a" href="#" mr={3}>
                 <img src={logoStripe} />
               </MKTypography>
               <MKTypography component="a" href="#">
@@ -120,8 +126,6 @@ export default function Landing() {
       >
         <Information />
         <Team />
-        {/* <Featuring />
-        <Newsletter /> */}
       </Card>
       <MKBox pt={6} px={1} mt={6} mb={4}>
         <SimpleFooter company={{ href: "/", name: "eigthkeh" }} dark />
