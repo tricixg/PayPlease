@@ -15,14 +15,16 @@ import MKTypography from "../../../assets/components/MKTypography";
 import BalanceCounterCard from "../../../assets/examples/Cards/CounterCards/BalanceCounterCard";
 import TransferModal from "./TransferModal";
 
+// Session Authentication
+import { useAuth } from "context/AuthContext";
+
 export default function Overview() {
   const [balance, setBalance] = useState(null);
   const [balanceDecimals, setBalanceDecimals] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [transferSuccess, setTransferSuccess] = useState(null);
   const location = useLocation();
-  const user_id = new URLSearchParams(location.search).get("user_id");
-  const token = new URLSearchParams(location.search).get("token");
+  const { user } = useAuth();
 
   function formatDateToDDMMYYYY(dateString) {
     const date = new Date(dateString);
@@ -33,59 +35,62 @@ export default function Overview() {
   }
 
   useEffect(() => {
-    // Get wallet balance
-    fetch(`/api/wallet/balance/${user_id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Failed to fetch balance");
-        }
+    if (user) {
+      const { user_id, token } = user;
+      // Get wallet balance
+      fetch(`/api/wallet/balance/${user_id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .then((data) => {
-        console.log("Balance:", data.balance);
-        setBalance(data.balance);
-        setBalanceDecimals(
-          Math.round(+parseFloat(`${data.balance}`))
-            .toFixed(2)
-            .toString()
-            .split(".")
-            .at(1)
-        );
-      })
-      .catch((error) => {
-        console.error("Error fetching balance:", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to fetch balance");
+          }
+        })
+        .then((data) => {
+          console.log("Balance:", data.balance);
+          setBalance(data.balance);
+          setBalanceDecimals(
+            Math.round(+parseFloat(`${data.balance}`))
+              .toFixed(2)
+              .toString()
+              .split(".")
+              .at(1)
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching balance:", error);
+        });
 
-    // Fetch transaction history
-    fetch(`/api/transaction/history/${user_id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Failed to fetch history");
-        }
+      // Fetch transaction history
+      fetch(`/api/transaction/history/${user_id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .then((data) => {
-        console.log("History:", data);
-        setTransactions(data.transactions);
-      })
-      .catch((error) => {
-        console.error("Error fetching history:", error);
-      });
-  }, [user_id, token]); // Add user_id and token as dependencies
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to fetch history");
+          }
+        })
+        .then((data) => {
+          console.log("History:", data);
+          setTransactions(data.transactions);
+        })
+        .catch((error) => {
+          console.error("Error fetching history:", error);
+        });
+    }
+  }, [user]); // user as dependencies
 
   return (
     <Grid container alignItems={"center"} justifyContent={"center"} rowGap={8} columnGap={4}>

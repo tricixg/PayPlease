@@ -32,6 +32,7 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import Landing from "./pages/Landing";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import SignOut from "./pages/SignOut";
 import Dashboard from "./pages/Dashboard";
 
 export const MainRoutes = [
@@ -57,6 +58,11 @@ export const MainRoutes = [
             name: "Sign Up",
             route: "/authentication/signup",
             component: <SignUp />,
+          },
+          {
+            name: "Sign Out",
+            route: "/authentication/signout",
+            component: <SignOut />,
           },
         ],
       },

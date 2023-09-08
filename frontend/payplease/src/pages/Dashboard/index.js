@@ -22,10 +22,14 @@ import { WalletRoutes as routes } from "routes";
 // Images
 import bgImage from "../../assets/images/bg-landing.jpg";
 
+// Session Authentication
+import { useAuth } from "context/AuthContext";
+
 export default function Landing() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isSignedIn = new URLSearchParams(location.search).get("token");
+  const { user } = useAuth();
+  const isSignedIn = !!user;
 
   useEffect(() => {
     if (!isSignedIn) navigate("/authentication/signin");
@@ -36,12 +40,21 @@ export default function Landing() {
       <DefaultNavbar
         brand={"PayPlease"}
         routes={routes}
-        action={{
-          type: "internal",
-          route: "/authentication/signin",
-          label: "Login / Logout",
-          color: "white",
-        }}
+        action={
+          isSignedIn
+            ? {
+                type: "internal",
+                route: "/authentication/signout",
+                label: "Logout",
+                color: "white",
+              }
+            : {
+                type: "internal",
+                route: "/authentication/signin",
+                label: "Login",
+                color: "white",
+              }
+        }
         transparent
         light
       />

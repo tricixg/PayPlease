@@ -25,6 +25,9 @@ import MKTypography from "../../../assets/components/MKTypography";
 import TransferForm from "./TransferForm";
 import MKAlert from "assets/components/MKAlert";
 
+// Session Authentication
+import { useAuth } from "context/AuthContext";
+
 export default function TransferModal({ setTransferSuccess }) {
   TransferModal.propTypes = {
     setTransferSuccess: PropTypes.func.isRequired,
@@ -36,49 +39,51 @@ export default function TransferModal({ setTransferSuccess }) {
   const [recipient, setRecipient] = useState(null);
   const [error, setError] = useState(null);
   const location = useLocation();
-  const user_id = new URLSearchParams(location.search).get("user_id");
-  const token = new URLSearchParams(location.search).get("token");
+  const { user } = useAuth();
 
   const handleSendMoney = async () => {
-    try {
-      // TODO: Implement send money functionality
-      console.log(`Send ${amount} to ${recipient}!`);
-      console.log(token);
-      const description = null;
-      fetch(`/api/transaction/transfer`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          amount: amount,
-          debit_uid: user_id,
-          creditor: recipient,
-          description: description,
-        }),
-      })
-        .then((response) => {
-          if (response.ok) {
-            setTransferSuccess(true);
-            setTimeout(() => setTransferSuccess(null), 10000);
-            toggleModal();
-            return response.json();
-          } else {
-            throw new Error("Failed to transfer");
-          }
+    if (user) {
+      try {
+        const { user_id, token } = user;
+        // TODO: Implement send money functionality
+        console.log(`Send ${amount} to ${recipient}!`);
+        console.log(token);
+        const description = null;
+        fetch(`/api/transaction/transfer`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount: amount,
+            debit_uid: user_id,
+            creditor: recipient,
+            description: description,
+          }),
         })
-        .then((data) => {
-          console.log("Balance:", data);
-        })
-        .catch((error) => {
-          console.error("Error fetching balance:", error);
-        });
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle errors here, e.g., display an error message to the user
-      setError(error);
-      setTimeout(() => setError(null), 15000);
+          .then((response) => {
+            if (response.ok) {
+              setTransferSuccess(true);
+              setTimeout(() => setTransferSuccess(null), 10000);
+              toggleModal();
+              return response.json();
+            } else {
+              throw new Error("Failed to transfer");
+            }
+          })
+          .then((data) => {
+            console.log("Balance:", data);
+          })
+          .catch((error) => {
+            console.error("Error fetching balance:", error);
+          });
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle errors here, e.g., display an error message to the user
+        setError(error);
+        setTimeout(() => setError(null), 15000);
+      }
     }
   };
 
