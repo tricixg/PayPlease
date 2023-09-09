@@ -18,11 +18,24 @@ import TopupModal from "./TopupModal";
 import WithdrawModal from "./WithdrawModal";
 
 export default function Overview() {
+  const styles = {
+    greenText: {
+      color: "green",
+    },
+    redText: {
+      color: "red",
+    },
+  };
+  const [username, setUsername] = useState("");
   const [balance, setBalance] = useState(null);
   const [balanceDecimals, setBalanceDecimals] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [transferSuccess, setTransferSuccess] = useState(null);
   const { user } = useAuth();
+  const [topupSuccess, setTopupSuccess] = useState(false);
+  const handleTopupSuccess = (success) => {
+    setTopupSuccess(success);
+  };
 
   function formatDateToDDMMYYYY(dateString) {
     const date = new Date(dateString);
@@ -52,6 +65,7 @@ export default function Overview() {
         })
         .then((data) => {
           console.log("Balance:", data.balance);
+          setUsername(data.username);
           setBalance(data.balance);
           setBalanceDecimals(
             Math.round(+parseFloat(`${data.balance}`))
@@ -87,8 +101,16 @@ export default function Overview() {
         .catch((error) => {
           console.error("Error fetching history:", error);
         });
+      // Reset topupSuccess after using it
+      if (topupSuccess) {
+        setTopupSuccess(false);
+      }
+
+      if (transferSuccess) {
+        setTransferSuccess(false);
+      }
     }
-  }, [user]);
+  }, [user, topupSuccess, transferSuccess]);
 
   return (
     <Grid container alignItems="center" justifyContent="center" rowGap={8} columnGap={4}>
@@ -98,8 +120,8 @@ export default function Overview() {
         style={{ marginTop: "50px", marginLeft: "85px", marginBottom: "-100px" }}
       >
         <TransferModal setTransferSuccess={setTransferSuccess} />
-        <TopupModal setTransferSuccess={setTransferSuccess} />
-        <WithdrawModal setWithdrawalSuccess={setTransferSuccess} />
+        <TopupModal onTopupSuccess={(success) => handleTopupSuccess(success)} />
+        <WithdrawModal setTransferSuccess={setTransferSuccess} />
       </Grid>
       {/* Left Card */}
       <Grid item xs={10} lg={5}>
@@ -140,6 +162,7 @@ export default function Overview() {
             <table style={{ color: "white" }}>
               <thead>
                 <tr>
+                  <th style={{ fontSize: "15px" }}>ACTION</th>
                   <th style={{ fontSize: "15px" }}>FROM</th>
                   <th style={{ fontSize: "15px" }}>TO</th>
                   <th style={{ fontSize: "15px" }}>DATE</th>
@@ -149,10 +172,20 @@ export default function Overview() {
               <tbody>
                 {transactions.map((transaction, i) => (
                   <tr key={i}>
+                    <td style={{ fontSize: "13px" }}>{transaction.trx_type}</td>
                     <td style={{ fontSize: "13px" }}>{transaction.debitor_username}</td>
                     <td style={{ fontSize: "13px" }}>{transaction.creditor_username}</td>
                     <td style={{ fontSize: "13px" }}>{formatDateToDDMMYYYY(transaction.date)}</td>
-                    <td style={{ fontSize: "13px" }}>${transaction.amount}</td>
+                    <td
+                      style={{
+                        fontSize: "13px",
+                        ...(transaction.creditor_username === username
+                          ? styles.greenText // Apply greenText class if it's the current user
+                          : styles.redText), // Apply redText class if it's not the current user
+                      }}
+                    >
+                      ${transaction.amount}
+                    </td>
                   </tr>
                 ))}
               </tbody>
