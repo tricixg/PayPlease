@@ -18,11 +18,26 @@ import MKTypography from "../../../assets/components/MKTypography";
 // sections
 import TopupForm from "./TopupForm";
 
-export default function TopupModal() {
+import PropTypes from "prop-types"; // Import PropTypes
+
+TopupModal.propTypes = {
+  onTopupSuccess: PropTypes.func.isRequired, // Add prop validation
+};
+
+export default function TopupModal({ onTopupSuccess }) {
   const [show, setShow] = useState(false);
 
   const toggleModal = () => {
     setShow(!show);
+  };
+
+  const handleTopupSuccess = (success) => {
+    // You can perform actions based on the success state here
+    console.log(success);
+    if (success) {
+      toggleModal();
+      onTopupSuccess(success);
+    }
   };
 
   return (
@@ -49,7 +64,10 @@ export default function TopupModal() {
                 <CloseIcon fontSize="medium" sx={{ cursor: "pointer" }} onClick={toggleModal} />
               </MKBox>
               <Divider sx={{ my: 0 }} />
-              <TopupForm toggleModal={toggleModal} />
+              <TopupForm
+                onTopupSuccess={(success) => handleTopupSuccess(success)}
+                toggleModal={toggleModal}
+              />
               <Divider sx={{ my: 0 }} />
               <MKBox display="flex" justifyContent="space-between" p={1.5}></MKBox>
             </MKBox>

@@ -138,7 +138,7 @@ export default function TransferForm({
             <Grid item xs={12} p={1}>
               <MKInput
                 variant="standard"
-                placeholder="Search (TO IMPLEMENT)"
+                placeholder="Search by Number / Username / Email"
                 fullWidth
                 InputProps={{
                   endAdornment: (
