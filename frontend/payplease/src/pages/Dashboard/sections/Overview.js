@@ -105,8 +105,12 @@ export default function Overview() {
       if (topupSuccess) {
         setTopupSuccess(false);
       }
+
+      if (transferSuccess) {
+        setTransferSuccess(false);
+      }
     }
-  }, [user, topupSuccess]);
+  }, [user, topupSuccess, transferSuccess]);
 
   return (
     <Grid container alignItems="center" justifyContent="center" rowGap={8} columnGap={4}>
