@@ -1,5 +1,6 @@
 const express = require('express');
-const { findUser, loginUser, signupUser } = require('../controller/userController.js');
+const authenticate = require('../middleware/authenticate')
+const { findUser, loginUser, signupUser, checkUserStripeConnect, connectUserToStripe } = require('../controller/userController.js');
 
 const router = express.Router();
 
@@ -11,4 +12,12 @@ router.post('/login', loginUser);
 // Register Page
 router.post('/signup', signupUser);
 
+// ----  [protected] ----
+
+router.use(authenticate)
+// check and update if user connected to stripe already
+router.get('/stripeconnect/:id', checkUserStripeConnect);
+
+// connect user to stripe using Connect onboarding
+router.post('/stripeconnect/', connectUserToStripe);
 module.exports = router;

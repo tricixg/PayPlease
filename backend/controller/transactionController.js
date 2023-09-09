@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const { createNewTransaction, getTransactionHistoryByWallet } = require('../queries/transactionQueries');
 const { updateWalletBalance, getWalletFromUserId, getWalletIdFromUserId } = require('../queries/walletQueries');
-const { getUserByParam, getUsernameFromWalletId } = require('../queries/userQueries');
+const { getUserByParam, getUsernameFromWalletId, getUserStripeId } = require('../queries/userQueries');
 
 // TODO secret key in .env
 const stripe = require('stripe')("sk_test_51NkrWXA2kau6fLsqOyJvGAXseIIyHNbf0ejoks9cs9bI7FWVjzqwyw9boj67ilx8FQfG9nzfWnuhPrZvmW8bJsD400a8z6IqeR");
@@ -109,33 +109,55 @@ const topUpTransaction = async (req, res) => {
 }
 
 const withdrawTransaction = async (req, res) => {
-    let {user_id, amount, user_stripe_id} = req.body;
-    const { user_id: authenicated_user_id } = req.user;
-
-    // amount must be integer in cents.
-    dollarAmount = parseFloat(amount.toFixed(2));
-    centAmount = dollarAmount * 100;
-
-    // verify if user to topUp is the same as user who made the request
-    if (authenicated_user_id !== user_id) {
-        return res.status(401).json({message: 'unauthorized'});
-    }
-
     try {
-        const wallet_id = await getWalletIdFromUserId(user_id);
-        if (!wallet_id) {
-            throw Error("wallet does not exist")
-        }
+      let { user_id, amount } = req.body;
+      const { user_id: authenticated_user_id } = req.user;
+  
+      // Convert amount to cents (integer)
+      const dollarAmount = parseFloat(amount.toFixed(2));
+      const centAmount = Math.round(dollarAmount * 100);
+  
+      // Verify if the authenticated user matches the requested user
+      if (authenticated_user_id !== user_id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+  
+      // Retrieve the wallet ID for the user
+      const wallet_id = await getWalletIdFromUserId(user_id);
+  
+      //const user_stripe_id = await getUserStripeId(user_id);
+      //console.log(user_stripe_id)
+      // Check if the wallet exists
+      if (!wallet_id) {
+        throw new Error("Wallet does not exist");
+      }
 
-        console.log(user_stripe_id)
+    //   const transfer = await stripe.transfers.create({
+    //     amount: centAmount,
+    //     currency: 'usd',
+    //     destination: user_stripe_id,
+    //   });
 
+    //   const balance = await stripe.balance.retrieve({
+    //     stripeAccount: user_stripe_id,
+    //   });
+    //   console.log(balance)
 
-        const transfer = await stripe.transfers.create({
-            amount: centAmount,
-            currency: 'sgd',
-            destination: user_stripe_id,
-        });
-
+      //if (centAmount<=balance) {
+        // Create a transfer using Stripe
+        
+        // const payout = await stripe.payouts.create(
+        //     {
+        //     amount: centAmount,
+        //     currency: 'usd',
+        //     method: 'instant',
+        //     },
+        //     {
+        //     stripeAccount: user_stripe_id,
+        //     }
+        // );
+    
+        // Create a new transaction record
         await createNewTransaction(
             uuidv4(),
             "Withdraw",
@@ -145,18 +167,20 @@ const withdrawTransaction = async (req, res) => {
             new Date(),
             "",
         );
-        
-        updateWalletBalance(wallet_id, dollarAmount * -1);
-
-        res.status(200).json({ message: "withdraw successful" });
-
+    
+        // Update the wallet balance (subtract the withdrawn amount)
+        await updateWalletBalance(wallet_id, dollarAmount * -1);
+      //}
+  
+      // Respond with success
+      res.status(200).json({ message: "Withdrawal successful" });
     } catch (error) {
-        console.log(error.message);
-        res.status(400).json(error.message);
+      console.error(error.message);
+      res.status(400).json({ error: error.message });
     }
-
-
 }
+
+  
 
 
 async function transferTransaction(req, res) {

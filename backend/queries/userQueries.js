@@ -12,6 +12,38 @@ async function getUserById(user_id) {
     }
 }
 
+async function updateUserStripeIsConnected(user_id, isConnected) {
+    try {
+        await db.query("UPDATE wallet.users SET stripe_connected = $1 WHERE user_id = $2", [isConnected, user_id]);
+    } catch (error) {
+        console.log("Database Error: Error updating user stripe_connected");
+        throw Error(error.message)
+    }
+}
+
+async function updateUserStripeId(user_id, stripe_id) {
+    try {
+        await db.query("UPDATE wallet.users SET stripe_id = $1 WHERE user_id = $2", [stripe_id, user_id]);
+    } catch (error) {
+        console.log("Database Error: Error updating user stripe id");
+        throw Error(error.message)
+    }
+}
+
+async function getUserStripeId(user_id) {
+    try {
+        const result = await db.query("SELECT stripe_id FROM wallet.users WHERE user_id = $1", [user_id]);
+        if (result.rows.length > 0) {
+            return result.rows[0].stripe_id;
+        } else {
+            return null; // User not found or stripe_id not set
+        }
+    } catch (error) {
+        console.log("Database Error: Error fetching user stripe id");
+        throw Error(error.message);
+    }
+}
+
 async function getUsernameFromWalletId(wallet_id) {
     try {
         // Query the wallet.wallets table to get the user_id
@@ -119,7 +151,10 @@ async function insertUser(user) {
 
 
 module.exports = {
+    getUserStripeId,
     getUserById,
+    updateUserStripeIsConnected,
+    updateUserStripeId,
     getUserByUsername,
     getUserByEmail,
     getUserByPhone,

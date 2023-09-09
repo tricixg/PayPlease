@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
-const { getUserById, getUserByUsername, getUserByPhone, getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
+const { updateUserStripeIsConnected, updateUserStripeId, getUserById, getUserByUsername, getUserByPhone, getUserByEmail, isEmailTaken, insertUser } = require("../queries/userQueries");
 const { createWallet } = require("../queries/walletQueries");
 const jwt = require('jsonwebtoken');
 
@@ -108,4 +108,109 @@ const signupUser = async(req, res) => {
     }
 }
 
-module.exports = { findUser, loginUser, signupUser };
+// protected endpoint
+const checkUserStripeConnect = async (req, res) => {
+    const { id: user_id } = req.params;
+    const { user_id: authenticated_user_id } = req.user;
+
+    // Verify if the user to check is the same as the user who made the request
+    if (authenticated_user_id !== user_id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+
+    }
+    try {
+        const user = await getUserById(user_id);
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        if (!user.stripe_id) {
+            // no stripe_id, definitely not connected yet
+            return res.status(200).json({ isConnected: false });
+        }
+
+        const isConnected = user.stripe_connected;
+        console.log(isConnected);
+
+        if (!isConnected) { // might be string, have to use === "false instead"
+            // get stripe account and check if "charges_enabled" to determine if onboarding completed.
+            const account = await stripe.accounts.retrieve(user.stripe_id);
+            if (account.charges_enabled) {
+                // onboarding has been completed, update database and return true
+                await updateUserStripeIsConnected(user_id, true)
+                return res.status(200).json({ isConnected: true })
+            }
+        }
+
+        res.status(200).json({ isConnected });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'An error occurred while registering user' });
+    }
+}
+
+// protected endpoint
+const connectUserToStripe = async (req, res) => {
+    const { user_id, return_url } = req.body;
+    const { user_id: authenticated_user_id } = req.user;
+
+    // Verify if the user to check is the same as the user who made the request
+    if (authenticated_user_id !== user_id) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    try {
+        const user = await getUserById(user_id);
+            if (!user) {
+                return res.status(400).json({ message: 'User not found' });
+            } 
+
+            if (user.stripe_connected) {
+                return res.status(400).json({ message: 'User already connected' });
+            }
+        
+        let stripeAccountId = user.stripe_id;
+
+        if (!stripeAccountId) {
+            // no stripe id yet, create and add to database
+            const account = await stripe.accounts.create({
+                country: 'SG',
+                type: 'custom',
+                capabilities: {
+                    card_payments: {
+                        requested: true,
+                    },
+                    transfers: {
+                        requested: true,
+                    },
+                },
+                business_type: 'individual',
+                business_profile: {
+                url: 'https://localost.com',
+                },
+            });
+
+            stripeAccountId = account.id;
+            await updateUserStripeId(user_id, stripeAccountId);
+        }
+
+        // create connection url link
+        const accountLink = await stripe.accountLinks.create({
+            account: stripeAccountId,
+            refresh_url: "https://localhost:3002/wallet/dashboard",
+            return_url: "https://localhost:3002/wallet/dashboard",// TODO change to be sent in req body
+            type: "account_onboarding",
+            collect: 'eventually_due',
+        });
+
+        // do not update stripe_connected boolean, users might not have completed onboarding. Try to update the next time 
+        // checkUserStripeConnect is called.
+
+        res.status(200).json({ url: accountLink.url });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'An error occurred while connecting to stripe' });
+    }
+}
+
+module.exports = { findUser, loginUser, signupUser, checkUserStripeConnect, connectUserToStripe };
