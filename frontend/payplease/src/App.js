@@ -1,28 +1,21 @@
-import { useEffect } from "react";
-
-// react-router components
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
-// @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
-// Material Kit 2 React themes
 import theme from "./assets/theme";
-
-// Material Kit 2 React routes
 import { MainRoutes as routes } from "routes";
-
-// PayPlease pages
 import Landing from "pages/Landing";
-
-// Session token
 import { AuthContextProvider } from "context/AuthContext";
+import { Elements } from "@stripe/react-stripe-js"; // Import Elements
+import { loadStripe } from "@stripe/stripe-js";
+
+const PUBLIC_KEY =
+  "pk_test_51NkrWXA2kau6fLsqzRhwcHc4TjtrI6fRUfWnJvOtV07BmB1eO95D2xvsyKOTysLMKFRTUxTy3qAJalaLUaj2sLu600tvv5LbWI";
+const stripePromise = loadStripe(PUBLIC_KEY);
 
 export default function App() {
   const { pathname } = useLocation();
 
-  // Setting page scroll to 0 when changing the route
   useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -45,11 +38,13 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthContextProvider>
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="/landing" element={<Landing />} />
-          <Route path="*" element={<Navigate to="/landing" />} />
-        </Routes>
+        <Elements stripe={stripePromise}>
+          <Routes>
+            {getRoutes(routes)}
+            <Route path="/landing" element={<Landing />} />
+            <Route path="*" element={<Navigate to="/landing" />} />
+          </Routes>
+        </Elements>
       </AuthContextProvider>
     </ThemeProvider>
   );

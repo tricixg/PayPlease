@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 // react-router components
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -27,7 +27,6 @@ import { useAuth } from "context/AuthContext";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const isSignedIn = !!user;
 
