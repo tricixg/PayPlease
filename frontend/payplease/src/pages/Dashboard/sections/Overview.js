@@ -99,7 +99,7 @@ export default function Overview() {
       >
         <TransferModal setTransferSuccess={setTransferSuccess} />
         <TopupModal setTransferSuccess={setTransferSuccess} />
-        <WithdrawModal setTransferSuccess={setTransferSuccess} />
+        <WithdrawModal setWithdrawalSuccess={setTransferSuccess} />
       </Grid>
       {/* Left Card */}
       <Grid item xs={10} lg={5}>
