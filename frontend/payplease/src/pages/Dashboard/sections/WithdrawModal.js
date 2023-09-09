@@ -25,8 +25,8 @@ import MKAlert from "assets/components/MKAlert";
 // Session Authentication
 import { useAuth } from "context/AuthContext";
 
-export default function TransferModal({ setTransferSuccess }) {
-  TransferModal.propTypes = {
+export default function WithdrawModal({ setTransferSuccess }) {
+  WithdrawModal.propTypes = {
     setTransferSuccess: PropTypes.func.isRequired,
   };
   const [show, setShow] = useState(false);
@@ -34,10 +34,10 @@ export default function TransferModal({ setTransferSuccess }) {
   const [amount, setAmount] = useState(0);
   const [factor, setFactor] = useState(1);
   const [recipient, setRecipient] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const { user } = useAuth();
 
-  const handleSendMoney = async () => {
+  const handleTopUp = async () => {
     if (user) {
       try {
         const { user_id, token } = user;
@@ -90,8 +90,8 @@ export default function TransferModal({ setTransferSuccess }) {
     <MKBox component="section">
       <Container>
         <Grid container item xs={12} justifyContent="center" mx="auto">
-          <MKButton variant="gradient" color="info" size="large" fullWidth onClick={toggleModal}>
-            make a transfer
+          <MKButton variant="gradient" color="primary" size="large" fullWidth onClick={toggleModal}>
+            Withdraw
           </MKButton>
         </Grid>
         <Modal open={show} onClose={toggleModal} sx={{ display: "grid", placeItems: "center" }}>
@@ -106,7 +106,7 @@ export default function TransferModal({ setTransferSuccess }) {
               shadow="xl"
             >
               <MKBox display="flex" alignItems="center" justifyContent="space-between" p={2}>
-                <MKTypography variant="h5">PayPlease Transfer</MKTypography>
+                <MKTypography variant="h5">PayPlease Top Up</MKTypography>
                 <CloseIcon fontSize="medium" sx={{ cursor: "pointer" }} onClick={toggleModal} />
               </MKBox>
               <Divider sx={{ my: 0 }} />
@@ -124,7 +124,7 @@ export default function TransferModal({ setTransferSuccess }) {
                   close
                 </MKButton>
                 {error && <MKAlert color={"error"}>{error}</MKAlert>}
-                <MKButton variant="gradient" color="info" onClick={handleSendMoney}>
+                <MKButton variant="gradient" color="info" onClick={handleTopUp}>
                   send
                 </MKButton>
               </MKBox>

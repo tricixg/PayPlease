@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-// react-router components
-import { useLocation } from "react-router-dom";
-
 // @mui material components
 import Grid from "@mui/material/Grid";
 
@@ -17,13 +14,14 @@ import TransferModal from "./TransferModal";
 
 // Session Authentication
 import { useAuth } from "context/AuthContext";
+import TopupModal from "./TopupModal";
+import WithdrawModal from "./WithdrawModal";
 
 export default function Overview() {
   const [balance, setBalance] = useState(null);
   const [balanceDecimals, setBalanceDecimals] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [transferSuccess, setTransferSuccess] = useState(null);
-  const location = useLocation();
   const { user } = useAuth();
 
   function formatDateToDDMMYYYY(dateString) {
@@ -94,8 +92,14 @@ export default function Overview() {
 
   return (
     <Grid container alignItems="center" justifyContent="center" rowGap={8} columnGap={4}>
-      <Grid item xs={12}>
+      <Grid
+        container
+        xs={12}
+        style={{ marginTop: "50px", marginLeft: "85px", marginBottom: "-100px" }}
+      >
         <TransferModal setTransferSuccess={setTransferSuccess} />
+        <TopupModal setTransferSuccess={setTransferSuccess} />
+        <WithdrawModal setTransferSuccess={setTransferSuccess} />
       </Grid>
       {/* Left Card */}
       <Grid item xs={10} lg={5}>

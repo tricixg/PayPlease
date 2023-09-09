@@ -61,7 +61,7 @@ const topUpTransaction = async (req, res) => {
     const { user_id: authenicated_user_id } = req.user;
 
     // amount must be integer in cents.
-    dollarAmount = parseFloat(amount.toFixed(2));
+    dollarAmount = parseFloat(amount);
     centAmount = dollarAmount * 100;
 
     // verify if user to topUp is the same as user who made the request
